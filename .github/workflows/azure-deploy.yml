@@ -1,0 +1,56 @@
+name: Deploy UrbanFlow to Azure App Service (CitizenTech no Ar)
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+env:
+  AZURE_WEBAPP_NAME: 'rg-urbanflow-prd'
+  NODE_VERSION: '20.x'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: '1. Checkout do Código (rafadagalera/urbanflow)'
+        uses: actions/checkout@v4
+
+      - name: '2. Configurar Node.js ${{ env.NODE_VERSION }}'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: '3. Instalar Dependências e Compilar Frontend (TypeScript + Vite Build)'
+        working-directory: apps/web
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+
+      - name: '4. Preparar Artefato de Produção (SPA + API Embarcada)'
+        run: |
+          mkdir -p deploy_dist
+          cp -r apps/web/dist deploy_dist/dist
+          cp apps/web/server.mjs deploy_dist/server.mjs
+          cat << 'EOF' > deploy_dist/package.json
+          {
+            "name": "urbanflow-azure-production",
+            "version": "1.0.0",
+            "private": true,
+            "type": "module",
+            "scripts": {
+              "start": "node server.mjs"
+            }
+          }
+          EOF
+
+      - name: '5. Deploy Automático para Azure App Service (Brazil South)'
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: deploy_dist
