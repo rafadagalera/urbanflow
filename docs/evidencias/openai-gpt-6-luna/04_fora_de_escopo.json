@@ -1,0 +1,29 @@
+{
+ "pergunta": "Me passa uma receita de bolo de cenoura com cobertura de chocolate.",
+ "modelo": "openai/gpt-6-luna",
+ "prompt": "../prompts/04_fora_de_escopo.json",
+ "saida_bruta": [
+  "{\"resposta\":\"Não posso ajudar com receitas. Posso ajudar com o uso do painel UrbanCare, alertas, indicadores e dados de pontos e distritos.\",\"tipo\":\"fora_de_escopo\",\"fontes\":[],\"pontos_citados\":[],\"acao_sugerida\":null,\"precisa_humano\":false,\"confianca\":\"alta\"}"
+ ],
+ "saida_validada": {
+  "resposta": "Não posso ajudar com receitas. Posso ajudar com o uso do painel UrbanCare, alertas, indicadores e dados de pontos e distritos.",
+  "tipo": "fora_de_escopo",
+  "fontes": [],
+  "pontos_citados": [],
+  "acao_sugerida": null,
+  "precisa_humano": false,
+  "confianca": "alta"
+ },
+ "meta": {
+  "modelo": "openai/gpt-6-luna",
+  "chamadas": 1,
+  "eventos": [],
+  "tokens_entrada": 4586,
+  "tokens_saida": 84,
+  "custo_usd": 0.000467,
+  "status": "ok",
+  "tem_dados": true,
+  "latencia_ms": 1800
+ },
+ "gerado_em": "2026-11-18T20:52:37+00:00"
+}

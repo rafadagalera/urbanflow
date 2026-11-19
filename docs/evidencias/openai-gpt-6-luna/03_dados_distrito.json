@@ -1,0 +1,38 @@
+{
+ "pergunta": "Quais são os pontos de ônibus mais vulneráveis da Sé?",
+ "modelo": "openai/gpt-6-luna",
+ "prompt": "../prompts/03_dados_distrito.json",
+ "saida_bruta": [
+  "{\"resposta\":\"No distrito SE, os cinco pontos mais vulneráveis são:\\n1. PQ. D. PEDRO II, 0 (ponto_id 800015291): índice 0,805; posição 29.\\n2. AV. DO ESTADO, 0 (ponto_id 800015932): índice 0,797; posição 33.\\n3. AV. DA LIBERDADE, 170 (ponto_id 800016574): índice 0,778; posição 50.\\n4. AV. DA LIBERDADE, 47 (ponto_id 800016572): índice 0,776; posição 53.\\n5. R. DR. RODRIGO SILVA, 26 (ponto_id 8010160): índice 0,764; posição 71.\\nTodos estão na faixa alta. O índice indica onde um abrigo pode ajudar mais; não significa que o local ou seus moradores sejam perigosos. Boletins de ocorrência também refletem diferenças de notificação.\",\"tipo\":\"dados\",\"fontes\":[\"gold.ft_resumo_distrito#SE\",\"manual#indice\"],\"pontos_citados\":[\"800015291\",\"800015932\",\"800016574\",\"800016572\",\"8010160\"],\"acao_sugerida\":null,\"precisa_humano\":false,\"confianca\":\"alta\"}"
+ ],
+ "saida_validada": {
+  "resposta": "No distrito SE, os cinco pontos mais vulneráveis são:\n1. PQ. D. PEDRO II, 0 (ponto_id 800015291): índice 0,805; posição 29.\n2. AV. DO ESTADO, 0 (ponto_id 800015932): índice 0,797; posição 33.\n3. AV. DA LIBERDADE, 170 (ponto_id 800016574): índice 0,778; posição 50.\n4. AV. DA LIBERDADE, 47 (ponto_id 800016572): índice 0,776; posição 53.\n5. R. DR. RODRIGO SILVA, 26 (ponto_id 8010160): índice 0,764; posição 71.\nTodos estão na faixa alta. O índice indica onde um abrigo pode ajudar mais; não significa que o local ou seus moradores sejam perigosos. Boletins de ocorrência também refletem diferenças de notificação.",
+  "tipo": "dados",
+  "fontes": [
+   "gold.ft_resumo_distrito#SE",
+   "manual#indice"
+  ],
+  "pontos_citados": [
+   "800015291",
+   "800015932",
+   "800016574",
+   "800016572",
+   "8010160"
+  ],
+  "acao_sugerida": null,
+  "precisa_humano": false,
+  "confianca": "alta"
+ },
+ "meta": {
+  "modelo": "openai/gpt-6-luna",
+  "chamadas": 1,
+  "eventos": [],
+  "tokens_entrada": 4923,
+  "tokens_saida": 476,
+  "custo_usd": 0.000705,
+  "status": "ok",
+  "tem_dados": true,
+  "latencia_ms": 4752
+ },
+ "gerado_em": "2026-11-18T20:52:35+00:00"
+}

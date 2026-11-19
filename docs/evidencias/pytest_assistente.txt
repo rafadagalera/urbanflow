@@ -1,0 +1,56 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.15, pytest-8.3.4, pluggy-1.7.0 -- /usr/local/bin/python
+rootdir: /app
+plugins: anyio-4.16.0
+collecting ... collected 42 items
+
+tests/test_api.py::test_perguntar_ok PASSED                              [  2%]
+tests/test_api.py::test_entrada_invalida_422[corpo0] PASSED              [  4%]
+tests/test_api.py::test_entrada_invalida_422[corpo1] PASSED              [  7%]
+tests/test_api.py::test_entrada_invalida_422[corpo2] PASSED              [  9%]
+tests/test_api.py::test_entrada_invalida_422[corpo3] PASSED              [ 11%]
+tests/test_api.py::test_falha_total_ainda_e_200 PASSED                   [ 14%]
+tests/test_api.py::test_saude_e_pagina PASSED                            [ 16%]
+tests/test_cliente_http.py::test_omite_temperature_se_modelo_nao_aceita PASSED [ 19%]
+tests/test_cliente_http.py::test_envia_temperature_se_aceita_ou_lista_indisponivel PASSED [ 21%]
+tests/test_contexto.py::test_detectar_distrito[Quais os pontos mais vulner\xe1veis de Pinheiros?-PINHEIROS] PASSED [ 23%]
+tests/test_contexto.py::test_detectar_distrito[pontos da S\xe9-SE] PASSED [ 26%]
+tests/test_contexto.py::test_detectar_distrito[e no distrito da se?-SE] PASSED [ 28%]
+tests/test_contexto.py::test_detectar_distrito[O que acontece se o ponto apagar?-None] PASSED [ 30%]
+tests/test_contexto.py::test_detectar_distrito[Se eu quiser exportar o ranking?-None] PASSED [ 33%]
+tests/test_contexto.py::test_detectar_distrito[Como est\xe1 a Cidade Dutra?-CIDADE DUTRA] PASSED [ 35%]
+tests/test_contexto.py::test_detectar_distrito[ranking no Jardim Paulista-JARDIM PAULISTA] PASSED [ 38%]
+tests/test_contexto.py::test_detectar_distrito[a sa\xfade dos dados est\xe1 ok?-None] PASSED [ 40%]
+tests/test_contexto.py::test_detectar_distrito[Pontos na Sa\xfade e no Jabaquara-SAUDE] PASSED [ 42%]
+tests/test_contexto.py::test_detectar_distrito[Liberdade de express\xe3o no painel?-None] PASSED [ 45%]
+tests/test_contexto.py::test_detectar_distrito[e o bairro da liberdade?-LIBERDADE] PASSED [ 47%]
+tests/test_contexto.py::test_detectar_distrito[consola\xe7\xe3o-CONSOLACAO] PASSED [ 50%]
+tests/test_contexto.py::test_manual_em_secoes PASSED                     [ 52%]
+tests/test_contexto.py::test_contexto_com_dados PASSED                   [ 54%]
+tests/test_contexto.py::test_contexto_sem_dados[None] PASSED             [ 57%]
+tests/test_contexto.py::test_contexto_sem_dados[repo_1] PASSED           [ 59%]
+tests/test_contexto.py::test_contexto_sem_dados[repo_2] PASSED           [ 61%]
+tests/test_contexto.py::test_contexto_nunca_lista_todos_os_pontos PASSED [ 64%]
+tests/test_llm.py::test_resposta_valida PASSED                           [ 66%]
+tests/test_llm.py::test_json_com_cerca_e_texto_ao_redor PASSED           [ 69%]
+tests/test_llm.py::test_json_invalido_reparado PASSED                    [ 71%]
+tests/test_llm.py::test_reparo_falha_vai_para_reserva PASSED             [ 73%]
+tests/test_llm.py::test_429_retenta_e_depois_reserva PASSED              [ 76%]
+tests/test_llm.py::test_503_uma_vez_recupera_no_mesmo_modelo PASSED      [ 78%]
+tests/test_llm.py::test_timeout_vai_para_reserva PASSED                  [ 80%]
+tests/test_llm.py::test_json_schema_recusado_usa_json_object PASSED      [ 83%]
+tests/test_llm.py::test_tudo_falha_resposta_segura PASSED                [ 85%]
+tests/test_llm.py::test_sem_chave_nao_chama_modelo PASSED                [ 88%]
+tests/test_llm.py::test_ponto_alucinado_removido_e_confianca_baixa PASSED [ 90%]
+tests/test_llm.py::test_acao_de_patrulha_forca_humano PASSED             [ 92%]
+tests/test_llm.py::test_resposta_longa_demais_e_reparada PASSED          [ 95%]
+tests/test_llm.py::test_pergunta_vai_delimitada_e_sanitizada PASSED      [ 97%]
+tests/test_llm.py::test_log_sem_texto PASSED                             [100%]
+
+=============================== warnings summary ===============================
+../usr/local/lib/python3.12/site-packages/starlette/testclient.py:40
+  /usr/local/lib/python3.12/site-packages/starlette/testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 42 passed, 1 warning in 0.42s =========================

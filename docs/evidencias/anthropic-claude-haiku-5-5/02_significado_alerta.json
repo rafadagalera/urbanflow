@@ -1,0 +1,32 @@
+{
+ "pergunta": "O que significa o alerta de pessoa sozinha à noite e o que eu devo fazer?",
+ "modelo": "anthropic/claude-haiku-5.5",
+ "prompt": "../prompts/02_significado_alerta.json",
+ "saida_bruta": [
+  "{\"resposta\": \"O alerta de pessoa sozinha à noite aparece entre 21h e 5h, quando o abrigo detecta uma única pessoa esperando por um período prolongado. O alerta não identifica a pessoa, não guarda imagem e não traz informações sobre gênero, idade ou aparência. Ele é uma sugestão de patrulhamento preventivo. O que fazer: avaliar o contexto, como o horário do próximo ônibus e outros alertas na região. A decisão de acionar a Guarda Civil Metropolitana ou outra equipe é sempre de um operador humano. Não trate o alerta como suspeita sobre a pessoa, pois ela é quem está sendo protegida.\", \"tipo\": \"uso\", \"fontes\": [\"manual#alertas\", \"manual#privacidade\"], \"pontos_citados\": [], \"acao_sugerida\": \"Avaliar o contexto do alerta (próximo ônibus e outros alertas na região) e decidir sobre o patrulhamento preventivo.\", \"precisa_humano\": true, \"confianca\": \"alta\"}"
+ ],
+ "saida_validada": {
+  "resposta": "O alerta de pessoa sozinha à noite aparece entre 21h e 5h, quando o abrigo detecta uma única pessoa esperando por um período prolongado. O alerta não identifica a pessoa, não guarda imagem e não traz informações sobre gênero, idade ou aparência. Ele é uma sugestão de patrulhamento preventivo. O que fazer: avaliar o contexto, como o horário do próximo ônibus e outros alertas na região. A decisão de acionar a Guarda Civil Metropolitana ou outra equipe é sempre de um operador humano. Não trate o alerta como suspeita sobre a pessoa, pois ela é quem está sendo protegida.",
+  "tipo": "uso",
+  "fontes": [
+   "manual#alertas",
+   "manual#privacidade"
+  ],
+  "pontos_citados": [],
+  "acao_sugerida": "Avaliar o contexto do alerta (próximo ônibus e outros alertas na região) e decidir sobre o patrulhamento preventivo.",
+  "precisa_humano": true,
+  "confianca": "alta"
+ },
+ "meta": {
+  "modelo": "anthropic/claude-haiku-5.5",
+  "chamadas": 1,
+  "eventos": [],
+  "tokens_entrada": 7925,
+  "tokens_saida": 367,
+  "custo_usd": 0.000976,
+  "status": "ok",
+  "tem_dados": true,
+  "latencia_ms": 3228
+ },
+ "gerado_em": "2026-11-18T20:52:05+00:00"
+}

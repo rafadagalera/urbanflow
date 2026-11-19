@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Assistente UrbanCare</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --tx:#1b1f24; --mut:#4b5563; --bd:#d0d5dc; --pri:#0b5cad; --pri-tx:#fff;
+          --ok:#0f6b3a; --warn:#8a4b00; --bad:#a1122a; --chip:#eef1f5; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#121417; --card:#1b1f24; --tx:#eef1f5; --mut:#b4bcc6; --bd:#39414b;
+          --pri:#6aa9ec; --pri-tx:#0b1220; --ok:#5fd393; --warn:#f2b45c; --bad:#ff8a9b; --chip:#262c33; } }
+  * { box-sizing:border-box } body { margin:0; font:16px/1.5 system-ui,sans-serif; background:var(--bg); color:var(--tx) }
+  main { max-width:760px; margin:0 auto; padding:16px }
+  h1 { font-size:1.4rem; margin:.5rem 0 } p.sub { color:var(--mut); margin:0 0 1rem }
+  form { display:flex; gap:8px; flex-wrap:wrap } label { width:100%; font-weight:600 }
+  textarea { flex:1 1 300px; min-height:64px; padding:10px; border:1px solid var(--bd); border-radius:8px; background:var(--card); color:var(--tx); font:inherit }
+  button { padding:10px 18px; border:0; border-radius:8px; background:var(--pri); color:var(--pri-tx); font:inherit; font-weight:600; cursor:pointer }
+  button:disabled { opacity:.6; cursor:wait }
+  :focus-visible { outline:3px solid var(--pri); outline-offset:2px }
+  .cont { color:var(--mut); font-size:.85rem; width:100% }
+  .msg { background:var(--card); border:1px solid var(--bd); border-radius:10px; padding:14px; margin-top:14px }
+  .q { font-weight:600; margin-bottom:6px } .r { white-space:pre-wrap }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px }
+  .chip { background:var(--chip); border-radius:999px; padding:2px 10px; font-size:.85rem }
+  .alta { color:var(--ok) } .media { color:var(--warn) } .baixa, .humano, .erro { color:var(--bad) }
+  .meta { color:var(--mut); font-size:.85rem; margin-top:8px }
+  .ex { display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 } .ex button { background:var(--chip); color:var(--tx); font-weight:400; padding:6px 10px }
+  footer { color:var(--mut); font-size:.8rem; margin-top:24px }
+</style>
+</head>
+<body>
+<main>
+  <h1>Assistente UrbanCare</h1>
+  <p class="sub">Dúvidas sobre o painel, os alertas e os dados do dia. Não informe dados pessoais.</p>
+  <div class="ex" aria-label="Perguntas de exemplo">
+    <button type="button" data-q="Como eu atendo um alerta de pessoa sozinha à noite?">Alerta de pessoa sozinha</button>
+    <button type="button" data-q="Quais são os pontos mais vulneráveis de Pinheiros?">Pontos de Pinheiros</button>
+    <button type="button" data-q="Quais abrigos estão escuros agora?">Abrigos escuros agora</button>
+  </div>
+  <form id="f">
+    <label for="q">Sua pergunta</label>
+    <textarea id="q" name="pergunta" maxlength="500" required aria-describedby="cont"></textarea>
+    <button id="b" type="submit">Perguntar</button>
+    <span id="cont" class="cont">0/500 caracteres. Enter envia; Shift+Enter quebra a linha.</span>
+  </form>
+  <section id="hist" aria-live="polite" aria-label="Respostas"></section>
+  <footer id="saude">Verificando o serviço…</footer>
+</main>
+<script>
+const f = document.getElementById('f'), q = document.getElementById('q'), b = document.getElementById('b'),
+      hist = document.getElementById('hist'), cont = document.getElementById('cont');
+const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+const rotTipo = { uso: 'uso do painel', dados: 'dados', fora_de_escopo: 'fora do escopo', erro: 'erro' };
+q.addEventListener('input', () => cont.textContent = `${q.value.length}/500 caracteres. Enter envia; Shift+Enter quebra a linha.`);
+q.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); f.requestSubmit(); } });
+document.querySelectorAll('[data-q]').forEach(x => x.addEventListener('click', () => { q.value = x.dataset.q; q.dispatchEvent(new Event('input')); f.requestSubmit(); }));
+f.addEventListener('submit', async e => {
+  e.preventDefault();
+  const pergunta = q.value.trim(); if (!pergunta) return;
+  b.disabled = true; b.textContent = 'Pensando…';
+  const card = el('article', 'msg'); card.append(el('div', 'q', pergunta)); hist.prepend(card);
+  try {
+    const r = await fetch('/perguntar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pergunta }) });
+    const d = await r.json();
+    if (!r.ok) { card.append(el('div', 'r erro', 'Pergunta inválida: use de 1 a 500 caracteres.')); return; }
+    card.append(el('div', 'r' + (d.tipo === 'erro' ? ' erro' : ''), d.resposta));
+    const chips = el('div', 'chips');
+    chips.append(el('span', 'chip', 'Tipo: ' + (rotTipo[d.tipo] || d.tipo)));
+    chips.append(el('span', 'chip ' + d.confianca, 'Confiança: ' + d.confianca));
+    if (d.precisa_humano) chips.append(el('span', 'chip humano', 'Requer decisão humana'));
+    card.append(chips);
+    if (d.acao_sugerida) card.append(el('div', 'meta', 'Ação sugerida: ' + d.acao_sugerida));
+    if (d.fontes.length) card.append(el('div', 'meta', 'Fontes: ' + d.fontes.join(', ')));
+  } catch { card.append(el('div', 'r erro', 'Não foi possível falar com o serviço.')); }
+  finally { b.disabled = false; b.textContent = 'Perguntar'; q.value = ''; q.dispatchEvent(new Event('input')); q.focus(); }
+});
+fetch('/saude').then(r => r.json()).then(s => {
+  document.getElementById('saude').textContent = `Modelo: ${s.modelo} (reserva: ${s.modelo_reserva}) · ` +
+    (s.chave_presente ? 'chave configurada' : 'SEM CHAVE') + ' · ' +
+    (s.dados_gold && s.ultima_execucao ? 'dados de ' + new Date(s.ultima_execucao.fim).toLocaleString('pt-BR') : 'dados indisponíveis') +
+    ' · leituras de sensor simuladas';
+}).catch(() => document.getElementById('saude').textContent = 'Serviço indisponível.');
+</script>
+</body>
+</html>

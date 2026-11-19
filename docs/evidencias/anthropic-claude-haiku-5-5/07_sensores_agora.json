@@ -1,0 +1,38 @@
+{
+ "pergunta": "Quais abrigos estão escuros agora e desde quando?",
+ "modelo": "anthropic/claude-haiku-5.5",
+ "prompt": "../prompts/07_sensores_agora.json",
+ "saida_bruta": [
+  "{\"resposta\": \"Há 4 abrigos com leitura abaixo de 10 lux na última medição. Todos estão escuros desde 17/11/2026 às 18:00. Os leituras são simuladas nesta versão de demonstração:\\n- ponto_id 3702832, METRÔ CONCEIÇÃO, 0 (distrito Jabaquara), lux 3.1\\n- ponto_id 6311404, R. FERREIRA DE ARAÚJO, 221 (distrito Pinheiros), lux 2.7\\n- ponto_id 7000007, AL. EDUARDO PRADO, 854 (distrito Santa Cecília), lux 1.9\\n- ponto_id 70016916, AV. PAULISTA, 1374 (distrito Bela Vista), lux 2.3\\nSe o ponto também estiver na faixa alta de vulnerabilidade, marque o chamado de zeladoria como prioritário. A lista completa pode ser vista na tela de pontos escuros agora.\", \"tipo\": \"dados\", \"fontes\": [\"gold.vw_pontos_escuros_agora\", \"manual#alertas\", \"manual#dados\"], \"pontos_citados\": [\"3702832\", \"6311404\", \"7000007\", \"70016916\"], \"acao_sugerida\": \"Abrir chamado de zeladoria com a concessionária de iluminação para cada ponto, informando o horário \\\"escuro desde\\\", e marcar como prioritário os que estiverem na faixa alta.\", \"precisa_humano\": false, \"confianca\": \"alta\"}"
+ ],
+ "saida_validada": {
+  "resposta": "Há 4 abrigos com leitura abaixo de 10 lux na última medição. Todos estão escuros desde 17/11/2026 às 18:00. Os leituras são simuladas nesta versão de demonstração:\n- ponto_id 3702832, METRÔ CONCEIÇÃO, 0 (distrito Jabaquara), lux 3.1\n- ponto_id 6311404, R. FERREIRA DE ARAÚJO, 221 (distrito Pinheiros), lux 2.7\n- ponto_id 7000007, AL. EDUARDO PRADO, 854 (distrito Santa Cecília), lux 1.9\n- ponto_id 70016916, AV. PAULISTA, 1374 (distrito Bela Vista), lux 2.3\nSe o ponto também estiver na faixa alta de vulnerabilidade, marque o chamado de zeladoria como prioritário. A lista completa pode ser vista na tela de pontos escuros agora.",
+  "tipo": "dados",
+  "fontes": [
+   "gold.vw_pontos_escuros_agora",
+   "manual#alertas",
+   "manual#dados"
+  ],
+  "pontos_citados": [
+   "3702832",
+   "6311404",
+   "7000007",
+   "70016916"
+  ],
+  "acao_sugerida": "Abrir chamado de zeladoria com a concessionária de iluminação para cada ponto, informando o horário \"escuro desde\", e marcar como prioritário os que estiverem na faixa alta.",
+  "precisa_humano": false,
+  "confianca": "alta"
+ },
+ "meta": {
+  "modelo": "anthropic/claude-haiku-5.5",
+  "chamadas": 1,
+  "eventos": [],
+  "tokens_entrada": 7914,
+  "tokens_saida": 522,
+  "custo_usd": 0.001052,
+  "status": "ok",
+  "tem_dados": true,
+  "latencia_ms": 2931
+ },
+ "gerado_em": "2026-11-18T20:52:25+00:00"
+}

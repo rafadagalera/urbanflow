@@ -1,0 +1,61 @@
+== 1. Linhas por tabela gold ==
+         tabela          | linhas 
+-------------------------+--------
+ dim_ponto               |  21414
+ ft_indicador_ponto      |  21414
+ ft_resumo_distrito      |     96
+ ft_evento_sensor        | 302890
+ vw_pontos_escuros_agora |      4
+ execucao                |      4
+
+== 2. Pontos por faixa de vulnerabilidade ==
+ faixa | pontos | indice_min | indice_max 
+-------+--------+------------+------------
+ alta  |   2142 |      0.494 |      0.910
+ media |   6424 |      0.341 |      0.494
+ baixa |  12848 |      0.000 |      0.341
+
+== 3. Os 10 pontos mais vulneráveis ==
+ ranking |             nome             |    distrito     | indice | ocorr_150m | dist_poste_m | faixa 
+---------+------------------------------+-----------------+--------+------------+--------------+-------
+       1 | R. MOURATO COELHO , 1022     | PINHEIROS       |  0.910 |        183 |         18.2 | alta
+       2 | R. AUGUSTA , 810             | CONSOLACAO      |  0.910 |        194 |         17.6 | alta
+       3 | AV. PAULISTA , 2027          | JARDIM PAULISTA |  0.898 |        120 |         25.2 | alta
+       4 | AV. BRIG. FARIA LIMA , 447   | PINHEIROS       |  0.883 |        136 |         18.6 | alta
+       5 | AV. PAULISTA , 2026          | CONSOLACAO      |  0.882 |        113 |         21.2 | alta
+       6 | R. FRADIQUE COUTINHO , 689   | PINHEIROS       |  0.865 |         99 |         20.5 | alta
+       7 | R. AUGUSTA , 753             | CONSOLACAO      |  0.858 |        184 |         14.9 | alta
+       8 | R. FERREIRA DE ARAÚJO , 221  | PINHEIROS       |  0.855 |         96 |         19.5 | alta
+       9 | R. PALESTRA ITÁLIA , 1708    | BARRA FUNDA     |  0.852 |        161 |         15.3 | alta
+      10 | AV. PEDROSO DE MORAES , 1619 | PINHEIROS       |  0.849 |         96 |         18.8 | alta
+
+== 4. Os 10 distritos com maior índice médio ==
+   distrito    | subprefeitura | pontos | indice_medio | pontos_faixa_alta | ocorrencias_noturnas 
+---------------+---------------+--------+--------------+-------------------+----------------------
+ REPUBLICA     | SE            |    122 |        0.566 |                83 |                 1833
+ BELA VISTA    | SE            |     53 |        0.558 |                33 |                 1248
+ CONSOLACAO    | SE            |     73 |        0.549 |                46 |                 1767
+ SE            | SE            |     85 |        0.544 |                50 |                  780
+ BARRA FUNDA   | LAPA          |    109 |        0.527 |                69 |                  959
+ PINHEIROS     | PINHEIROS     |    149 |        0.471 |                62 |                 2507
+ BRAS          | MOOCA         |     76 |        0.459 |                27 |                  567
+ SANTA CECILIA | SE            |     95 |        0.446 |                32 |                  964
+ PARI          | MOOCA         |     57 |        0.426 |                17 |                  305
+ BOM RETIRO    | SE            |     75 |        0.420 |                22 |                  556
+
+== 5. Pontos escuros agora (sensores simulados) ==
+ ponto_id |            nome             |   distrito    |      escuro_desde      | lux_atual 
+----------+-----------------------------+---------------+------------------------+-----------
+ 3702832  | METRÔ CONCEIÇÃO , 0         | JABAQUARA     | 2026-11-17 21:00:00+00 |       3.1
+ 6311404  | R. FERREIRA DE ARAÚJO , 221 | PINHEIROS     | 2026-11-17 21:00:00+00 |       2.7
+ 7000007  | AL. EDUARDO PRADO , 854     | SANTA CECILIA | 2026-11-17 21:00:00+00 |       1.9
+ 70016916 | AV. PAULISTA , 1374         | BELA VISTA    | 2026-11-17 21:00:00+00 |       2.3
+
+== 6. Últimas execuções do pipeline ==
+                run_id                |            inicio             |              fim              | status | linhas_indicador 
+--------------------------------------+-------------------------------+-------------------------------+--------+------------------
+ manual__2026-11-18T20:18:10+00:00    | 2026-11-18 20:18:11.371475+00 | 2026-11-18 20:21:02.87329+00  | ok     | 21414
+ manual__2026-11-18T20:11:34+00:00    | 2026-11-18 20:11:34.964848+00 | 2026-11-18 20:14:16.866171+00 | ok     | 21597
+ manual__2026-11-18T19:32:15+00:00    | 2026-11-18 19:34:49.182814+00 | 2026-11-18 19:37:25.406732+00 | ok     | 22517
+ scheduled__2026-11-17T03:00:00+00:00 | 2026-11-18 19:32:19.458132+00 | 2026-11-18 19:34:47.768212+00 | ok     | 22517
+

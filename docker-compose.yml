@@ -1,56 +1,103 @@
-# UrbanFlow — protótipo local. Reset do banco: docker compose down -v
+name: urbancare
+
+x-airflow: &airflow
+  build: ./pipeline
+  image: urbancare-airflow:2.10.5
+  user: "${AIRFLOW_UID}:0"
+  env_file: .env
+  environment:
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/airflow
+    AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY}
+    AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_SECRET_KEY}
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
+    AIRFLOW__CORE__DEFAULT_TIMEZONE: America/Sao_Paulo
+    AIRFLOW__WEBSERVER__DEFAULT_UI_TIMEZONE: America/Sao_Paulo
+    AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL: "30"
+    PYTHONPATH: /opt/airflow/pipeline
+    URBANCARE_DATA_DIR: /opt/airflow/data
+    DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/urbancare
+  volumes:
+    - ./pipeline/dags:/opt/airflow/dags
+    - ./pipeline:/opt/airflow/pipeline
+    - ./data:/opt/airflow/data
+    - ./logs:/opt/airflow/logs
+  depends_on: &airflow-deps
+    postgres:
+      condition: service_healthy
+
 services:
-  db:
-    image: timescale/timescaledb:2.17.2-pg16
+  postgres:
+    image: postgres:16
     environment:
-      POSTGRES_USER: urbanflow
-      POSTGRES_PASSWORD: urbanflow
-      POSTGRES_DB: urbanflow
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: postgres
     ports:
-      - "55432:5432"   # 5432 já é usado pelo host
+      - "55432:5432"
     volumes:
-      - dbdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/postgres-init:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U urbanflow -d urbanflow"]
-      interval: 3s
-      timeout: 3s
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d urbancare"]
+      interval: 5s
       retries: 20
 
-  api:
-    build: ./apps/api
+  airflow-init:
+    <<: *airflow
+    # Mantém o /entrypoint da imagem (registra o AIRFLOW_UID no /etc/passwd).
+    command:
+      - bash
+      - -c
+      - |
+        set -e
+        airflow db migrate
+        airflow users list | grep -qw "$${AIRFLOW_ADMIN_USER}" ||
+          airflow users create --role Admin --username "$${AIRFLOW_ADMIN_USER}" \
+            --password "$${AIRFLOW_ADMIN_PASSWORD}" --firstname Admin --lastname UrbanCare \
+            --email admin@example.org
+    restart: "no"
+
+  airflow-webserver:
+    <<: *airflow
+    command: webserver
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 15s
+      retries: 10
+    restart: unless-stopped
+    depends_on:
+      <<: *airflow-deps
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-scheduler:
+    <<: *airflow
+    command: scheduler
+    restart: unless-stopped
+    depends_on:
+      <<: *airflow-deps
+      airflow-init:
+        condition: service_completed_successfully
+
+  assistente:
+    build: ./assistente
+    image: urbancare-assistente:1.0
+    env_file: .env
     environment:
-      DATABASE_URL: postgresql://urbanflow:urbanflow@db:5432/urbanflow
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/urbancare
+    volumes:
+      - ./assistente:/app
+      - ./docs:/docs:ro
     ports:
       - "8000:8000"
     depends_on:
-      db:
+      postgres:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://localhost:8000/health')"]
-      interval: 3s
-      timeout: 3s
-      retries: 30
-
-  sim:
-    build: ./apps/sim
-    environment:
-      API_URL: http://api:8000
-    depends_on:
-      api:
-        condition: service_healthy
-
-  web:
-    image: node:22-alpine
-    working_dir: /app
-    command: sh -c "npm install --no-audit --no-fund && npm run dev -- --host 0.0.0.0"
-    volumes:
-      - ./apps/web:/app
-      - /app/node_modules
-    ports:
-      - "5173:5173"
-    depends_on:
-      api:
-        condition: service_healthy
+    restart: unless-stopped
 
 volumes:
-  dbdata:
+  pgdata:

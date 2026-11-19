@@ -1,0 +1,37 @@
+{
+ "pergunta": "Quais abrigos estão escuros agora e desde quando?",
+ "modelo": "openai/gpt-6-luna",
+ "prompt": "../prompts/07_sensores_agora.json",
+ "saida_bruta": [
+  "{\"resposta\":\"Os abrigos escuros agora (leituras simuladas) são:\\n- METRÔ CONCEIÇÃO, 0 (ponto_id 3702832), Jabaquara — escuro desde 17/11/2026 às 18:00; 3,1 lux.\\n- R. FERREIRA DE ARAÚJO, 221 (ponto_id 6311404), Pinheiros — desde 17/11/2026 às 18:00; 2,7 lux.\\n- AL. EDUARDO PRADO, 854 (ponto_id 7000007), Santa Cecília — desde 17/11/2026 às 18:00; 1,9 lux.\\n- AV. PAULISTA, 1374 (ponto_id 70016916), Bela Vista — desde 17/11/2026 às 18:00; 2,3 lux.\",\"tipo\":\"dados\",\"fontes\":[\"gold.vw_pontos_escuros_agora\",\"manual#dados\"],\"pontos_citados\":[\"3702832\",\"6311404\",\"7000007\",\"70016916\"],\"acao_sugerida\":\"Abrir chamados de zeladoria com a concessionária de iluminação, informando cada ponto e o horário em que ficou escuro.\",\"precisa_humano\":false,\"confianca\":\"alta\"}"
+ ],
+ "saida_validada": {
+  "resposta": "Os abrigos escuros agora (leituras simuladas) são:\n- METRÔ CONCEIÇÃO, 0 (ponto_id 3702832), Jabaquara — escuro desde 17/11/2026 às 18:00; 3,1 lux.\n- R. FERREIRA DE ARAÚJO, 221 (ponto_id 6311404), Pinheiros — desde 17/11/2026 às 18:00; 2,7 lux.\n- AL. EDUARDO PRADO, 854 (ponto_id 7000007), Santa Cecília — desde 17/11/2026 às 18:00; 1,9 lux.\n- AV. PAULISTA, 1374 (ponto_id 70016916), Bela Vista — desde 17/11/2026 às 18:00; 2,3 lux.",
+  "tipo": "dados",
+  "fontes": [
+   "gold.vw_pontos_escuros_agora",
+   "manual#dados"
+  ],
+  "pontos_citados": [
+   "3702832",
+   "6311404",
+   "7000007",
+   "70016916"
+  ],
+  "acao_sugerida": "Abrir chamados de zeladoria com a concessionária de iluminação, informando cada ponto e o horário em que ficou escuro.",
+  "precisa_humano": false,
+  "confianca": "alta"
+ },
+ "meta": {
+  "modelo": "openai/gpt-6-luna",
+  "chamadas": 1,
+  "eventos": [],
+  "tokens_entrada": 4585,
+  "tokens_saida": 407,
+  "custo_usd": 0.000628,
+  "status": "ok",
+  "tem_dados": true,
+  "latencia_ms": 5324
+ },
+ "gerado_em": "2026-11-18T20:52:51+00:00"
+}

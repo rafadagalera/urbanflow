@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640" width="1200" height="640" font-family="DejaVu Sans, Arial, Helvetica, sans-serif" font-size="13" fill="#1f2328">
+  <title>UrbanCare: arquitetura do pipeline de dados</title>
+  <defs>
+    <marker id="seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#57606a"/>
+    </marker>
+    <style>
+      .caixa { fill: #ffffff; stroke: #57606a; stroke-width: 1.4; }
+      .titulo { font-weight: bold; font-size: 15px; }
+      .sub { fill: #57606a; font-size: 12px; }
+      .tarefa { font-family: "DejaVu Sans Mono", Consolas, monospace; font-size: 12.5px; }
+      .fluxo { stroke: #57606a; stroke-width: 1.6; fill: none; marker-end: url(#seta); }
+      .fluxo-trac { stroke: #57606a; stroke-width: 1.4; fill: none; stroke-dasharray: 5 4; marker-end: url(#seta); }
+      .rotulo { fill: #57606a; font-size: 11.5px; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="640" fill="#ffffff"/>
+
+  <!-- Fontes -->
+  <text x="20" y="48" class="titulo">Fontes abertas</text>
+  <rect x="20" y="62" width="215" height="168" rx="6" class="caixa"/>
+  <text x="32" y="86" class="titulo">GeoSampa (WFS)</text>
+  <text x="32" y="108" class="tarefa">ponto_onibus</text>
+  <text x="32" y="124" class="sub">22.578 pontos</text>
+  <text x="32" y="146" class="tarefa">iluminacao_publica</text>
+  <text x="32" y="162" class="sub">662.945 luminárias, 65 páginas</text>
+  <text x="32" y="184" class="tarefa">distrito_municipal</text>
+  <text x="32" y="202" class="tarefa">subprefeitura</text>
+  <text x="32" y="219" class="sub">polígonos, EPSG:31983</text>
+
+  <rect x="20" y="252" width="215" height="96" rx="6" class="caixa"/>
+  <text x="32" y="276" class="titulo">SSP-SP</text>
+  <text x="32" y="297" class="tarefa">SPDadosCriminais_2025</text>
+  <text x="32" y="315" class="sub">xlsx de 196 MB, 2 abas</text>
+  <text x="32" y="332" class="sub">1.161.166 boletins</text>
+
+  <rect x="20" y="372" width="215" height="80" rx="6" class="caixa" stroke-dasharray="5 4"/>
+  <text x="32" y="396" class="titulo">Sensores do abrigo</text>
+  <text x="32" y="416" class="sub">SIMULADOS no pipeline</text>
+  <text x="32" y="433" class="sub">(semente = data da execução)</text>
+
+  <!-- Airflow -->
+  <rect x="262" y="24" width="606" height="510" rx="8" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.4"/>
+  <text x="278" y="48" class="titulo">Apache Airflow 2.10.5 · DAG urbancare_pipeline</text>
+  <text x="278" y="66" class="sub">@daily, LocalExecutor, 11 tarefas, ~2,5 min com o bronze em cache</text>
+
+  <!-- Bronze -->
+  <rect x="278" y="84" width="176" height="254" rx="6" fill="#fbefe3" stroke="#a5672e" stroke-width="1.4"/>
+  <text x="290" y="108" class="titulo" fill="#7a4a1d">Bronze</text>
+  <text x="290" y="126" class="sub">data/bronze/ (bruto)</text>
+  <text x="290" y="154" class="tarefa">extrair_pontos</text>
+  <text x="290" y="176" class="tarefa">extrair_postes</text>
+  <text x="290" y="198" class="tarefa">extrair_distritos</text>
+  <text x="290" y="220" class="tarefa">extrair_ssp</text>
+  <text x="290" y="252" class="sub">em paralelo; página a</text>
+  <text x="290" y="268" class="sub">página em disco, retoma</text>
+  <text x="290" y="284" class="sub">se o WFS cair; 4 retries</text>
+  <text x="290" y="300" class="sub">CSV, GeoJSON, xlsx</text>
+
+  <!-- Silver -->
+  <rect x="474" y="84" width="176" height="254" rx="6" fill="#eef1f4" stroke="#6e7781" stroke-width="1.4"/>
+  <text x="486" y="108" class="titulo" fill="#424a53">Silver</text>
+  <text x="486" y="126" class="sub">data/silver/*.parquet</text>
+  <text x="486" y="154" class="tarefa">tratar_ssp</text>
+  <text x="486" y="172" class="sub">noite + capital + coord.</text>
+  <text x="486" y="188" class="sub">50.999 BOs, sem NUM_BO</text>
+  <text x="486" y="216" class="tarefa">tratar_geo</text>
+  <text x="486" y="234" class="sub">EPSG:31983, distrito por</text>
+  <text x="486" y="250" class="sub">junção espacial</text>
+  <text x="486" y="266" class="sub">22.517 pontos</text>
+  <text x="486" y="282" class="sub">618.369 postes (dedup.)</text>
+  <text x="486" y="298" class="sub">50.968 BOs na cidade</text>
+
+  <!-- Gold -->
+  <rect x="670" y="84" width="182" height="254" rx="6" fill="#fbf4d9" stroke="#9a7d0a" stroke-width="1.4"/>
+  <text x="682" y="108" class="titulo" fill="#6b5600">Gold</text>
+  <text x="682" y="126" class="sub">data/gold/*.parquet</text>
+  <text x="682" y="154" class="tarefa">indicadores_ponto</text>
+  <text x="682" y="172" class="sub">KD-tree: postes e BOs</text>
+  <text x="682" y="188" class="sub">por raio; índice e ranking</text>
+  <text x="682" y="216" class="tarefa">resumo_distrito</text>
+  <text x="682" y="234" class="sub">96 distritos</text>
+  <text x="682" y="262" class="tarefa">simular_sensores</text>
+  <text x="682" y="280" class="sub">150 pontos × 7 dias,</text>
+  <text x="682" y="296" class="sub">leitura a cada 10 min</text>
+
+  <!-- Carga e qualidade -->
+  <rect x="670" y="370" width="182" height="62" rx="6" class="caixa"/>
+  <text x="682" y="394" class="tarefa">carregar_gold</text>
+  <text x="682" y="414" class="sub">COPY, 1 transação</text>
+  <rect x="670" y="458" width="182" height="62" rx="6" class="caixa"/>
+  <text x="682" y="482" class="tarefa">checar_qualidade</text>
+  <text x="682" y="502" class="sub">13 checagens → execucao</text>
+
+  <rect x="278" y="370" width="372" height="150" rx="6" fill="#ffffff" stroke="#d0d7de"/>
+  <text x="290" y="394" class="titulo">Contratos entre camadas</text>
+  <text x="290" y="416" class="sub">· cada tarefa grava em .tmp e renomeia (atômico)</text>
+  <text x="290" y="436" class="sub">· a lógica fica no pacote urbancare_pipeline;</text>
+  <text x="290" y="452" class="sub">  o mesmo fluxo roda sem Airflow:</text>
+  <text x="290" y="470" class="tarefa">  python -m urbancare_pipeline</text>
+  <text x="290" y="492" class="sub">· data/ fica fora do git; o código e o</text>
+  <text x="290" y="508" class="sub">  schema são versionados</text>
+
+  <!-- Postgres -->
+  <rect x="900" y="84" width="280" height="348" rx="8" fill="#eaf2fb" stroke="#336791" stroke-width="1.6"/>
+  <text x="914" y="110" class="titulo" fill="#1d4a6e">PostgreSQL 16</text>
+  <text x="914" y="128" class="sub">banco urbancare · schema gold</text>
+  <text x="914" y="160" class="tarefa">dim_ponto</text>
+  <text x="1166" y="160" class="sub" text-anchor="end">21.414</text>
+  <text x="914" y="184" class="tarefa">ft_indicador_ponto</text>
+  <text x="1166" y="184" class="sub" text-anchor="end">21.414</text>
+  <text x="914" y="208" class="tarefa">ft_resumo_distrito</text>
+  <text x="1166" y="208" class="sub" text-anchor="end">96</text>
+  <text x="914" y="232" class="tarefa">ft_evento_sensor</text>
+  <text x="1166" y="232" class="sub" text-anchor="end">302.890</text>
+  <text x="914" y="256" class="tarefa">vw_pontos_escuros_agora</text>
+  <text x="1166" y="256" class="sub" text-anchor="end">view</text>
+  <text x="914" y="280" class="tarefa">execucao</text>
+  <text x="1166" y="280" class="sub" text-anchor="end">log</text>
+  <text x="914" y="316" class="sub">PK, FK e CHECK no DDL;</text>
+  <text x="914" y="332" class="sub">tabelas recriadas a cada carga</text>
+  <text x="914" y="364" class="sub">banco airflow (metadados)</text>
+  <text x="914" y="380" class="sub">no mesmo servidor</text>
+  <text x="914" y="412" class="sub">porta 55432 no host</text>
+
+  <!-- Assistente -->
+  <rect x="900" y="470" width="280" height="110" rx="8" class="caixa"/>
+  <text x="914" y="494" class="titulo">Assistente UrbanCare</text>
+  <text x="914" y="514" class="sub">FastAPI, porta 8000</text>
+  <text x="914" y="532" class="sub">contexto = manual + resumo gold</text>
+  <text x="914" y="550" class="sub">LLM via OpenRouter, saída JSON</text>
+  <text x="914" y="568" class="sub">validada (Pydantic)</text>
+
+  <rect x="670" y="560" width="182" height="56" rx="6" class="caixa"/>
+  <text x="682" y="584" class="titulo">Operador / gestor</text>
+  <text x="682" y="602" class="sub">pergunta pelo navegador</text>
+
+  <!-- Fluxos -->
+  <path d="M235,146 H278" class="fluxo"/>
+  <path d="M235,300 H256 V230 H278" class="fluxo"/>
+  <path d="M454,211 H474" class="fluxo"/>
+  <path d="M650,211 H670" class="fluxo"/>
+  <path d="M235,412 H252 V352 H720 V340" class="fluxo-trac"/>
+  <text x="470" y="365" class="rotulo">parâmetros dos sensores</text>
+  <path d="M761,338 V370" class="fluxo"/>
+  <path d="M761,432 V458" class="fluxo"/>
+  <path d="M852,401 H900" class="fluxo"/>
+  <path d="M852,489 H876 V420 H900" class="fluxo-trac"/>
+  <path d="M1040,432 V470" class="fluxo"/>
+  <text x="1048" y="456" class="rotulo">SELECT (somente leitura)</text>
+  <path d="M852,588 H900" class="fluxo"/>
+</svg>

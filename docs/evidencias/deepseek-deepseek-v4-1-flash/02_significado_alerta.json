@@ -1,0 +1,32 @@
+{
+ "pergunta": "O que significa o alerta de pessoa sozinha à noite e o que eu devo fazer?",
+ "modelo": "deepseek/deepseek-v4.1-flash",
+ "prompt": "../prompts/02_significado_alerta.json",
+ "saida_bruta": [
+  "{\"resposta\": \"Entre 21h e 5h, o abrigo detecta uma única pessoa esperando por um período prolongado e abre o alerta \\\"pessoa sozinha à noite\\\". Ele não identifica a pessoa, não guarda imagem e não informa gênero, idade ou aparência — a câmera gera só silhuetas anônimas e contagens. Trate o alerta como sugestão de patrulhamento preventivo, nunca como suspeita: quem está ali é quem precisa de proteção. A decisão de acionar a Guarda Civil Metropolitana ou outra equipe é sempre de um operador humano, considerando o contexto (horário do próximo ônibus, outros alertas na região). Na tela Alertas, clique em \\\"Atender\\\" e, ao concluir, registre apenas a ação tomada e clique em \\\"Resolver\\\" — não anote dados pessoais nem descrições físicas.\", \"tipo\": \"uso\", \"fontes\": [\"manual#alertas\", \"manual#privacidade\"], \"pontos_citados\": [], \"acao_sugerida\": \"Avaliar o contexto do ponto (próximo ônibus e outros alertas na região) e decidir, como operador, se cabe acionar patrulhamento preventivo; registrar a ação no alerta.\", \"precisa_humano\": true, \"confianca\": \"alta\"}"
+ ],
+ "saida_validada": {
+  "resposta": "Entre 21h e 5h, o abrigo detecta uma única pessoa esperando por um período prolongado e abre o alerta \"pessoa sozinha à noite\". Ele não identifica a pessoa, não guarda imagem e não informa gênero, idade ou aparência — a câmera gera só silhuetas anônimas e contagens. Trate o alerta como sugestão de patrulhamento preventivo, nunca como suspeita: quem está ali é quem precisa de proteção. A decisão de acionar a Guarda Civil Metropolitana ou outra equipe é sempre de um operador humano, considerando o contexto (horário do próximo ônibus, outros alertas na região). Na tela Alertas, clique em \"Atender\" e, ao concluir, registre apenas a ação tomada e clique em \"Resolver\" — não anote dados pessoais nem descrições físicas.",
+  "tipo": "uso",
+  "fontes": [
+   "manual#alertas",
+   "manual#privacidade"
+  ],
+  "pontos_citados": [],
+  "acao_sugerida": "Avaliar o contexto do ponto (próximo ônibus e outros alertas na região) e decidir, como operador, se cabe acionar patrulhamento preventivo; registrar a ação no alerta.",
+  "precisa_humano": true,
+  "confianca": "alta"
+ },
+ "meta": {
+  "modelo": "deepseek/deepseek-v4.1-flash",
+  "chamadas": 1,
+  "eventos": [],
+  "tokens_entrada": 5095,
+  "tokens_saida": 386,
+  "custo_usd": 0.000756,
+  "status": "ok",
+  "tem_dados": true,
+  "latencia_ms": 2294
+ },
+ "gerado_em": "2026-11-18T20:52:56+00:00"
+}

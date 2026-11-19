@@ -1,0 +1,41 @@
+{
+ "pergunta": "Quais são os pontos de ônibus mais vulneráveis da Sé?",
+ "modelo": "anthropic/claude-haiku-5.5",
+ "prompt": "../prompts/03_dados_distrito.json",
+ "saida_bruta": [
+  "{\"resposta\": \"Os 5 pontos mais vulneráveis do distrito Sé, segundo o ranking atual (os dados os listam como 'distrito SE'):\\n1. PQ. D. PEDRO II, 0 (ponto_id 800015291): posição 29, índice 0,805, faixa alta, 47 ocorrências noturnas a 150 m, poste mais próximo a 42 m.\\n2. AV. DO ESTADO, 0 (ponto_id 800015932): posição 33, índice 0,797, faixa alta, 54 ocorrências noturnas, poste a 20 m.\\n3. AV. DA LIBERDADE, 170 (ponto_id 800016574): posição 50, índice 0,778, faixa alta, 42 ocorrências noturnas, poste a 21 m.\\n4. AV. DA LIBERDADE, 47 (ponto_id 800016572): posição 53, índice 0,776, faixa alta, 42 ocorrências noturnas, poste a 21 m.\\n5. R. DR. RODRIGO SILVA, 26 (ponto_id 8010160): posição 71, índice 0,764, faixa alta, 44 ocorrências noturnas, poste a 18 m.\\nO índice indica onde um abrigo inteligente tende a ajudar mais, não que a região seja perigosa. Os boletins também refletem onde há mais registro de ocorrências.\", \"tipo\": \"dados\", \"fontes\": [\"gold.ft_resumo_distrito#SE\", \"manual#indice\"], \"pontos_citados\": [\"800015291\", \"800015932\", \"800016574\", \"800016572\", \"8010160\"], \"acao_sugerida\": null, \"precisa_humano\": false, \"confianca\": \"alta\"",
+  "{\"resposta\": \"Os 5 pontos mais vulneráveis do distrito Sé, segundo o ranking atual (os dados os listam como 'distrito SE'): 1. PQ. D. PEDRO II, 0 (ponto_id 800015291): posição 29, índice 0,805, faixa alta, 47 ocorrências noturnas a 150 m, poste mais próximo a 42 m. 2. AV. DO ESTADO, 0 (ponto_id 800015932): posição 33, índice 0,797, faixa alta, 54 ocorrências noturnas, poste a 20 m. 3. AV. DA LIBERDADE, 170 (ponto_id 800016574): posição 50, índice 0,778, faixa alta, 42 ocorrências noturnas, poste a 21 m. 4. AV. DA LIBERDADE, 47 (ponto_id 800016572): posição 53, índice 0,776, faixa alta, 42 ocorrências noturnas, poste a 21 m. 5. R. DR. RODRIGO SILVA, 26 (ponto_id 8010160): posição 71, índice 0,764, faixa alta, 44 ocorrências noturnas, poste a 18 m. O índice indica onde um abrigo inteligente tende a ajudar mais, não que a região seja perigosa. Os boletins também refletem onde há mais registro de ocorrências.\", \"tipo\": \"dados\", \"fontes\": [\"gold.ft_resumo_distrito#SE\", \"manual#indice\"], \"pontos_citados\": [\"800015291\", \"800015932\", \"800016574\", \"800016572\", \"8010160\"], \"acao_sugerida\": null, \"precisa_humano\": false, \"confianca\": \"alta\"}"
+ ],
+ "saida_validada": {
+  "resposta": "Os 5 pontos mais vulneráveis do distrito Sé, segundo o ranking atual (os dados os listam como 'distrito SE'): 1. PQ. D. PEDRO II, 0 (ponto_id 800015291): posição 29, índice 0,805, faixa alta, 47 ocorrências noturnas a 150 m, poste mais próximo a 42 m. 2. AV. DO ESTADO, 0 (ponto_id 800015932): posição 33, índice 0,797, faixa alta, 54 ocorrências noturnas, poste a 20 m. 3. AV. DA LIBERDADE, 170 (ponto_id 800016574): posição 50, índice 0,778, faixa alta, 42 ocorrências noturnas, poste a 21 m. 4. AV. DA LIBERDADE, 47 (ponto_id 800016572): posição 53, índice 0,776, faixa alta, 42 ocorrências noturnas, poste a 21 m. 5. R. DR. RODRIGO SILVA, 26 (ponto_id 8010160): posição 71, índice 0,764, faixa alta, 44 ocorrências noturnas, poste a 18 m. O índice indica onde um abrigo inteligente tende a ajudar mais, não que a região seja perigosa. Os boletins também refletem onde há mais registro de ocorrências.",
+  "tipo": "dados",
+  "fontes": [
+   "gold.ft_resumo_distrito#SE",
+   "manual#indice"
+  ],
+  "pontos_citados": [
+   "800015291",
+   "800015932",
+   "800016574",
+   "800016572",
+   "8010160"
+  ],
+  "acao_sugerida": null,
+  "precisa_humano": false,
+  "confianca": "alta"
+ },
+ "meta": {
+  "modelo": "anthropic/claude-haiku-5.5",
+  "chamadas": 2,
+  "eventos": [
+   "anthropic/claude-haiku-5.5:reparo"
+  ],
+  "tokens_entrada": 17573,
+  "tokens_saida": 1850,
+  "custo_usd": 0.002682,
+  "status": "ok",
+  "tem_dados": true,
+  "latencia_ms": 10180
+ },
+ "gerado_em": "2026-11-18T20:52:15+00:00"
+}

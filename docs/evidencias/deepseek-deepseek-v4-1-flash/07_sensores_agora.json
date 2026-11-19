@@ -1,0 +1,37 @@
+{
+ "pergunta": "Quais abrigos estão escuros agora e desde quando?",
+ "modelo": "deepseek/deepseek-v4.1-flash",
+ "prompt": "../prompts/07_sensores_agora.json",
+ "saida_bruta": [
+  "{\"acao_sugerida\": \"Abrir chamado de zeladoria com a concessionária de iluminação para cada ponto, informando o horário \\\"escuro desde\\\"; marcar como prioritário os que estiverem na faixa alta (ex.: ponto_id 6311404).\", \"confianca\": \"alta\", \"fontes\": [\"gold.vw_pontos_escuros_agora\", \"manual#alertas\"], \"pontos_citados\": [\"3702832\", \"6311404\", \"7000007\", \"70016916\"], \"precisa_humano\": false, \"resposta\": \"Quatro abrigos estão escuros agora (lux abaixo de 10; leituras simuladas nesta demonstração):\\n\\n- ponto_id 3702832 | Metrô Conceição, distrito Jabaquara | escuro desde 17/11/2026 18:00 | lux atual 3,1\\n- ponto_id 6311404 | R. Ferreira de Araújo, 221, distrito Pinheiros | escuro desde 17/11/2026 18:00 | lux atual 2,7\\n- ponto_id 7000007 | Al. Eduardo Prado, 854, distrito Santa Cecília | escuro desde 17/11/2026 18:00 | lux atual 1,9\\n- ponto_id 70016916 | Av. Paulista, 1374, distrito Bela Vista | escuro desde 17/11/2026 18:00 | lux atual 2,3\\n\\nPara cada caso, abra chamado de zeladoria com a concessionária de iluminação informando o ponto e o horário \\\"escuro desde\\\". Se o ponto estiver na faixa alta, marque como prioritário.\", \"tipo\": \"dados\"}"
+ ],
+ "saida_validada": {
+  "resposta": "Quatro abrigos estão escuros agora (lux abaixo de 10; leituras simuladas nesta demonstração):\n\n- ponto_id 3702832 | Metrô Conceição, distrito Jabaquara | escuro desde 17/11/2026 18:00 | lux atual 3,1\n- ponto_id 6311404 | R. Ferreira de Araújo, 221, distrito Pinheiros | escuro desde 17/11/2026 18:00 | lux atual 2,7\n- ponto_id 7000007 | Al. Eduardo Prado, 854, distrito Santa Cecília | escuro desde 17/11/2026 18:00 | lux atual 1,9\n- ponto_id 70016916 | Av. Paulista, 1374, distrito Bela Vista | escuro desde 17/11/2026 18:00 | lux atual 2,3\n\nPara cada caso, abra chamado de zeladoria com a concessionária de iluminação informando o ponto e o horário \"escuro desde\". Se o ponto estiver na faixa alta, marque como prioritário.",
+  "tipo": "dados",
+  "fontes": [
+   "gold.vw_pontos_escuros_agora",
+   "manual#alertas"
+  ],
+  "pontos_citados": [
+   "3702832",
+   "6311404",
+   "7000007",
+   "70016916"
+  ],
+  "acao_sugerida": "Abrir chamado de zeladoria com a concessionária de iluminação para cada ponto, informando o horário \"escuro desde\"; marcar como prioritário os que estiverem na faixa alta (ex.: ponto_id 6311404).",
+  "precisa_humano": false,
+  "confianca": "alta"
+ },
+ "meta": {
+  "modelo": "deepseek/deepseek-v4.1-flash",
+  "chamadas": 1,
+  "eventos": [],
+  "tokens_entrada": 5355,
+  "tokens_saida": 446,
+  "custo_usd": 0.000857,
+  "status": "ok",
+  "tem_dados": true,
+  "latencia_ms": 3940
+ },
+ "gerado_em": "2026-11-18T20:53:25+00:00"
+}

@@ -1,0 +1,33 @@
+{
+ "pergunta": "Como eu uso a tela de Alertas para atender um chamado de escuridão?",
+ "modelo": "deepseek/deepseek-v4.1-flash",
+ "prompt": "../prompts/01_uso_painel.json",
+ "saida_bruta": [
+  "{\"resposta\": \"Na tela Alertas, a fila mostra os alertas abertos do mais recente para o mais antigo, com tipo, ponto, horário de início e estado (novo, em atendimento, resolvido). Alertas não atendidos em 15 minutos ficam destacados em laranja.\\n\\nPara um alerta de escuridão (luminosidade abaixo de 10 lux à noite, indicando lâmpada queimada, poste apagado ou falha de energia):\\n1. Clique em \\\"Atender\\\" para assumir o alerta.\\n2. Abra um chamado de zeladoria com a concessionária de iluminação, informando o ponto e o horário \\\"escuro desde\\\".\\n3. Se o ponto também estiver na faixa alta de vulnerabilidade, marque o chamado como prioritário.\\n4. Registre a ação tomada e clique em \\\"Resolver\\\".\\n\\nA tela \\\"pontos escuros agora\\\" lista todos os abrigos nessa situação. Se a equipe em campo disser que o local está iluminado, pode ser sujeira ou obstrução no sensor: nesse caso, abra chamado de manutenção do abrigo, não de iluminação.\", \"tipo\": \"uso\", \"fontes\": [\"manual#alertas\", \"manual#telas\", \"manual#problemas\"], \"pontos_citados\": [], \"acao_sugerida\": \"Assumir o alerta em \\\"Atender\\\" e abrir chamado de zeladoria com a concessionária de iluminação, informando ponto e horário \\\"escuro desde\\\".\", \"precisa_humano\": false, \"confianca\": \"alta\"}"
+ ],
+ "saida_validada": {
+  "resposta": "Na tela Alertas, a fila mostra os alertas abertos do mais recente para o mais antigo, com tipo, ponto, horário de início e estado (novo, em atendimento, resolvido). Alertas não atendidos em 15 minutos ficam destacados em laranja.\n\nPara um alerta de escuridão (luminosidade abaixo de 10 lux à noite, indicando lâmpada queimada, poste apagado ou falha de energia):\n1. Clique em \"Atender\" para assumir o alerta.\n2. Abra um chamado de zeladoria com a concessionária de iluminação, informando o ponto e o horário \"escuro desde\".\n3. Se o ponto também estiver na faixa alta de vulnerabilidade, marque o chamado como prioritário.\n4. Registre a ação tomada e clique em \"Resolver\".\n\nA tela \"pontos escuros agora\" lista todos os abrigos nessa situação. Se a equipe em campo disser que o local está iluminado, pode ser sujeira ou obstrução no sensor: nesse caso, abra chamado de manutenção do abrigo, não de iluminação.",
+  "tipo": "uso",
+  "fontes": [
+   "manual#alertas",
+   "manual#telas",
+   "manual#problemas"
+  ],
+  "pontos_citados": [],
+  "acao_sugerida": "Assumir o alerta em \"Atender\" e abrir chamado de zeladoria com a concessionária de iluminação, informando ponto e horário \"escuro desde\".",
+  "precisa_humano": false,
+  "confianca": "alta"
+ },
+ "meta": {
+  "modelo": "deepseek/deepseek-v4.1-flash",
+  "chamadas": 1,
+  "eventos": [],
+  "tokens_entrada": 5400,
+  "tokens_saida": 470,
+  "custo_usd": 0.001007,
+  "status": "ok",
+  "tem_dados": true,
+  "latencia_ms": 2595
+ },
+ "gerado_em": "2026-11-18T20:52:53+00:00"
+}

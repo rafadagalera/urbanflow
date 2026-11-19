@@ -1,0 +1,32 @@
+{
+ "pergunta": "Como eu uso a tela de Alertas para atender um chamado de escuridão?",
+ "modelo": "openai/gpt-6-luna",
+ "prompt": "../prompts/01_uso_painel.json",
+ "saida_bruta": [
+  "{\"resposta\":\"Na tela Alertas, selecione o alerta de escuridão e clique em “Atender”. Abra um chamado de zeladoria com a concessionária de iluminação, informando o ponto e o horário “escuro desde”. Se o ponto estiver na faixa alta de vulnerabilidade, marque o chamado como prioritário. Ao concluir, registre a ação tomada e clique em “Resolver”. Nesta demonstração, as leituras dos sensores são simuladas.\",\"tipo\":\"uso\",\"fontes\":[\"manual#alertas\",\"manual#dados\"],\"pontos_citados\":[],\"acao_sugerida\":\"Abrir chamado de zeladoria com a concessionária de iluminação.\",\"precisa_humano\":false,\"confianca\":\"alta\"}"
+ ],
+ "saida_validada": {
+  "resposta": "Na tela Alertas, selecione o alerta de escuridão e clique em “Atender”. Abra um chamado de zeladoria com a concessionária de iluminação, informando o ponto e o horário “escuro desde”. Se o ponto estiver na faixa alta de vulnerabilidade, marque o chamado como prioritário. Ao concluir, registre a ação tomada e clique em “Resolver”. Nesta demonstração, as leituras dos sensores são simuladas.",
+  "tipo": "uso",
+  "fontes": [
+   "manual#alertas",
+   "manual#dados"
+  ],
+  "pontos_citados": [],
+  "acao_sugerida": "Abrir chamado de zeladoria com a concessionária de iluminação.",
+  "precisa_humano": false,
+  "confianca": "alta"
+ },
+ "meta": {
+  "modelo": "openai/gpt-6-luna",
+  "chamadas": 1,
+  "eventos": [],
+  "tokens_entrada": 4589,
+  "tokens_saida": 160,
+  "custo_usd": 0.000654,
+  "status": "ok",
+  "tem_dados": true,
+  "latencia_ms": 2443
+ },
+ "gerado_em": "2026-11-18T20:52:27+00:00"
+}

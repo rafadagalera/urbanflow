@@ -1,0 +1,29 @@
+{
+ "pergunta": "Me passa uma receita de bolo de cenoura com cobertura de chocolate.",
+ "modelo": "anthropic/claude-haiku-5.5",
+ "prompt": "../prompts/04_fora_de_escopo.json",
+ "saida_bruta": [
+  "{\"resposta\": \"Não consigo ajudar com receitas. Posso ajudar com o painel UrbanCare: como usar as telas, como atender alertas de lotação, escuridão, pessoa sozinha à noite ou sensor sem comunicação, e dados do ranking de vulnerabilidade.\", \"tipo\": \"fora_de_escopo\", \"fontes\": [], \"pontos_citados\": [], \"acao_sugerida\": null, \"precisa_humano\": false, \"confianca\": \"alta\"}"
+ ],
+ "saida_validada": {
+  "resposta": "Não consigo ajudar com receitas. Posso ajudar com o painel UrbanCare: como usar as telas, como atender alertas de lotação, escuridão, pessoa sozinha à noite ou sensor sem comunicação, e dados do ranking de vulnerabilidade.",
+  "tipo": "fora_de_escopo",
+  "fontes": [],
+  "pontos_citados": [],
+  "acao_sugerida": null,
+  "precisa_humano": false,
+  "confianca": "alta"
+ },
+ "meta": {
+  "modelo": "anthropic/claude-haiku-5.5",
+  "chamadas": 1,
+  "eventos": [],
+  "tokens_entrada": 7922,
+  "tokens_saida": 168,
+  "custo_usd": 0.000876,
+  "status": "ok",
+  "tem_dados": true,
+  "latencia_ms": 1423
+ },
+ "gerado_em": "2026-11-18T20:52:17+00:00"
+}

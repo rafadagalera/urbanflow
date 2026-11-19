@@ -1,0 +1,32 @@
+{
+ "pergunta": "O que significa o alerta de pessoa sozinha à noite e o que eu devo fazer?",
+ "modelo": "openai/gpt-6-luna",
+ "prompt": "../prompts/02_significado_alerta.json",
+ "saida_bruta": [
+  "{\"resposta\":\"Entre 21h e 5h, o alerta indica que o abrigo detectou uma única pessoa esperando por um período prolongado. Não identifica a pessoa nem informa gênero, idade ou aparência. É apenas uma sugestão de patrulhamento preventivo: considere o contexto, como o horário do próximo ônibus e outros alertas, e decida como operador se deve acionar a Guarda Civil Metropolitana ou outra equipe. As leituras dos abrigos nesta demonstração são simuladas.\",\"tipo\":\"uso\",\"fontes\":[\"manual#alertas\",\"manual#dados\"],\"pontos_citados\":[],\"acao_sugerida\":\"Avaliar o contexto e decidir como operador se aciona uma equipe; registre apenas a ação tomada, sem dados pessoais.\",\"precisa_humano\":true,\"confianca\":\"alta\"}"
+ ],
+ "saida_validada": {
+  "resposta": "Entre 21h e 5h, o alerta indica que o abrigo detectou uma única pessoa esperando por um período prolongado. Não identifica a pessoa nem informa gênero, idade ou aparência. É apenas uma sugestão de patrulhamento preventivo: considere o contexto, como o horário do próximo ônibus e outros alertas, e decida como operador se deve acionar a Guarda Civil Metropolitana ou outra equipe. As leituras dos abrigos nesta demonstração são simuladas.",
+  "tipo": "uso",
+  "fontes": [
+   "manual#alertas",
+   "manual#dados"
+  ],
+  "pontos_citados": [],
+  "acao_sugerida": "Avaliar o contexto e decidir como operador se aciona uma equipe; registre apenas a ação tomada, sem dados pessoais.",
+  "precisa_humano": true,
+  "confianca": "alta"
+ },
+ "meta": {
+  "modelo": "openai/gpt-6-luna",
+  "chamadas": 1,
+  "eventos": [],
+  "tokens_entrada": 4590,
+  "tokens_saida": 236,
+  "custo_usd": 0.000543,
+  "status": "ok",
+  "tem_dados": true,
+  "latencia_ms": 3093
+ },
+ "gerado_em": "2026-11-18T20:52:30+00:00"
+}

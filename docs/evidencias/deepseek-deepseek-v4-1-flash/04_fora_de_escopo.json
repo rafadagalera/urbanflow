@@ -1,0 +1,29 @@
+{
+ "pergunta": "Me passa uma receita de bolo de cenoura com cobertura de chocolate.",
+ "modelo": "deepseek/deepseek-v4.1-flash",
+ "prompt": "../prompts/04_fora_de_escopo.json",
+ "saida_bruta": [
+  "{\"resposta\": \"Não posso ajudar com receitas: sou o assistente do painel UrbanCare e só trato de temas como mapa, ranking de vulnerabilidade, alertas (lotação, escuridão, pessoa sozinha à noite, sensor sem comunicação), telas do painel e privacidade dos dados. Se tiver uma dúvida sobre esses assuntos, é só perguntar.\", \"tipo\": \"fora_de_escopo\", \"fontes\": [], \"pontos_citados\": [], \"acao_sugerida\": null, \"precisa_humano\": false, \"confianca\": \"alta\"}"
+ ],
+ "saida_validada": {
+  "resposta": "Não posso ajudar com receitas: sou o assistente do painel UrbanCare e só trato de temas como mapa, ranking de vulnerabilidade, alertas (lotação, escuridão, pessoa sozinha à noite, sensor sem comunicação), telas do painel e privacidade dos dados. Se tiver uma dúvida sobre esses assuntos, é só perguntar.",
+  "tipo": "fora_de_escopo",
+  "fontes": [],
+  "pontos_citados": [],
+  "acao_sugerida": null,
+  "precisa_humano": false,
+  "confianca": "alta"
+ },
+ "meta": {
+  "modelo": "deepseek/deepseek-v4.1-flash",
+  "chamadas": 1,
+  "eventos": [],
+  "tokens_entrada": 5090,
+  "tokens_saida": 158,
+  "custo_usd": 0.001508,
+  "status": "ok",
+  "tem_dados": true,
+  "latencia_ms": 15699
+ },
+ "gerado_em": "2026-11-18T20:53:14+00:00"
+}

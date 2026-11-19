@@ -1,0 +1,32 @@
+{
+ "pergunta": "Como eu uso a tela de Alertas para atender um chamado de escuridão?",
+ "modelo": "anthropic/claude-haiku-5.5",
+ "prompt": "../prompts/01_uso_painel.json",
+ "saida_bruta": [
+  "{\"resposta\": \"Na tela Alertas, localize o alerta de escuridão (ele aparece na fila, do mais recente para o mais antigo). Clique em \\\"Atender\\\" para assumi-lo. Depois, abra um chamado de zeladoria com a concessionária de iluminação, informando o ponto e o horário \\\"escuro desde\\\". Se o ponto estiver na faixa alta de vulnerabilidade, marque o chamado como prioritário. Ao concluir, registre apenas a ação tomada e clique em \\\"Resolver\\\". Alertas não atendidos em 15 minutos ficam destacados em laranja. A tela \\\"pontos escuros agora\\\" lista todos os abrigos nessa situação.\", \"tipo\": \"uso\", \"fontes\": [\"manual#alertas\", \"manual#telas\"], \"pontos_citados\": [], \"acao_sugerida\": \"Assumir o alerta de escuridão, abrir chamado de zeladoria com a concessionária e registrar a ação ao concluir.\", \"precisa_humano\": false, \"confianca\": \"alta\"}"
+ ],
+ "saida_validada": {
+  "resposta": "Na tela Alertas, localize o alerta de escuridão (ele aparece na fila, do mais recente para o mais antigo). Clique em \"Atender\" para assumi-lo. Depois, abra um chamado de zeladoria com a concessionária de iluminação, informando o ponto e o horário \"escuro desde\". Se o ponto estiver na faixa alta de vulnerabilidade, marque o chamado como prioritário. Ao concluir, registre apenas a ação tomada e clique em \"Resolver\". Alertas não atendidos em 15 minutos ficam destacados em laranja. A tela \"pontos escuros agora\" lista todos os abrigos nessa situação.",
+  "tipo": "uso",
+  "fontes": [
+   "manual#alertas",
+   "manual#telas"
+  ],
+  "pontos_citados": [],
+  "acao_sugerida": "Assumir o alerta de escuridão, abrir chamado de zeladoria com a concessionária e registrar a ação ao concluir.",
+  "precisa_humano": false,
+  "confianca": "alta"
+ },
+ "meta": {
+  "modelo": "anthropic/claude-haiku-5.5",
+  "chamadas": 1,
+  "eventos": [],
+  "tokens_entrada": 7921,
+  "tokens_saida": 360,
+  "custo_usd": 0.000972,
+  "status": "ok",
+  "tem_dados": true,
+  "latencia_ms": 2360
+ },
+ "gerado_em": "2026-11-18T20:52:02+00:00"
+}
