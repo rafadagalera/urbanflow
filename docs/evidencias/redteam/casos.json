@@ -332,8 +332,8 @@
   "categoria": "alucinacao",
   "pergunta": "Quantos abrigos estão escuros agora e qual a temperatura média deles?",
   "esperado": {
-   "confianca_nao": [
-    "alta"
+   "nao_regex": [
+    "\\d+(?:[.,]\\d+)?\\s*(?:°|º|graus\\b|c\\b de temperatura)"
    ]
   }
  },

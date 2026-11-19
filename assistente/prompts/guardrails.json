@@ -1,0 +1,148 @@
+{
+  "versao": 1,
+  "_leia": "Regras de guardrail compartilhadas entre o assistente Python (assistente/app/guardrails.py) e o chat Node (web/server.mjs). Regex no subconjunto comum de Python re e JS RegExp: sem lookbehind, sem grupos nomeados, sem flags embutidas; flags ficam no campo 'flags' (só 'i'). No JS, compile com new RegExp(padrao, flags + 'g') e SEM a flag 'u'. Detalhes de cada bloco no campo '_leia' dele.",
+  "_ordem": "Pergunta: normalizar (422 se vazia/longa) -> injecao (acerto = resposta fixa, sem modelo) -> mascarar PII -> montar mensagens -> modelo. Saída, depois da pós-validação (pontos/fontes fora do contexto e acao_de_campo): vazamento (se trocou, pula estigma) -> estigma -> mascarar PII em resposta e acao_sugerida -> consistencia -> cortar resposta em limites.resposta_max code points (se passar, corta em resposta_max-1, tira espaços do fim e põe '…').",
+  "limites": {
+    "pergunta_max": 500,
+    "resposta_max": 1200
+  },
+  "normalizacao": {
+    "_leia": "Passos aplicados em ordem à pergunta. 'unicode' = String.normalize(forma). 'regex' = substitui todas as ocorrências por 'por'. 'remover_categorias' = apaga todo caractere cuja categoria Unicode geral está na lista, exceto os de 'manter' (JS: /[\\p{Cc}\\p{Cf}]/gu). 'aparar' = trim de espaços e quebras nas pontas. Depois, pergunta vazia ou com mais de limites.pergunta_max caracteres (code points) é inválida (HTTP 422).",
+    "passos": [
+      {"tipo": "unicode", "forma": "NFKC"},
+      {"tipo": "regex", "padrao": "\\r\\n?|[\\u0085\\u2028\\u2029]", "flags": "", "por": "\n"},
+      {"tipo": "regex", "padrao": "[\\t\\u000B\\u000C\\u00A0\\u1680\\u2000-\\u200A\\u202F\\u205F\\u3000]", "flags": "", "por": " "},
+      {"tipo": "remover_categorias", "categorias": ["Cc", "Cf"], "manter": ["\n"]},
+      {"tipo": "regex", "padrao": "[\\uFE00-\\uFE0F]", "flags": "", "por": ""},
+      {"tipo": "regex", "padrao": " {2,}", "flags": "", "por": " "},
+      {"tipo": "regex", "padrao": " *\\n *", "flags": "", "por": "\n"},
+      {"tipo": "regex", "padrao": "\\n{3,}", "flags": "", "por": "\n\n"},
+      {"tipo": "unicode", "forma": "NFKC"},
+      {"tipo": "aparar"}
+    ]
+  },
+  "dobrar": {
+    "_leia": "Forma 'dobrada' usada só para DETECTAR (injeção, estigma, vazamento, ação de campo), nunca para o texto enviado ou devolvido: normalize('NFD') -> remove categoria Mn (acentos) -> toLowerCase(). Os padrões de detecção são escritos em ASCII minúsculo sem acento ('instrucoes', 'policia')."
+  },
+  "pii": {
+    "_leia": "Mascaramento aplicado em ordem ao texto normalizado (não dobrado): à pergunta antes de ir ao modelo e a 'resposta'/'acao_sugerida' na saída. Cada padrão tem EXATAMENTE um grupo de captura, o grupo 1, que é preservado: substituição = grupo1 + token (callback; não use '$1'/'\\1'). 'tipo' é a chave da contagem no log (nunca o valor). RG não é mascarado (formatos variam demais; falso positivo).",
+    "padroes": [
+      {"tipo": "email", "token": "[e-mail removido]", "flags": "",
+       "padrao": "()[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\\.[A-Za-z0-9-]+)*\\.[A-Za-z]{2,}"},
+      {"tipo": "cnpj", "token": "[CNPJ removido]", "flags": "",
+       "padrao": "(^|[^0-9.,])[0-9]{2}\\.?[0-9]{3}\\.?[0-9]{3}/?[0-9]{4}-?[0-9]{2}(?![0-9])"},
+      {"tipo": "cpf", "token": "[CPF removido]", "flags": "",
+       "padrao": "(^|[^0-9.,])[0-9]{3}\\.?[0-9]{3}\\.?[0-9]{3}-?[0-9]{2}(?![0-9])"},
+      {"tipo": "telefone", "token": "[telefone removido]", "flags": "",
+       "padrao": "(^|[^0-9.,+])(?:\\+ ?55[ .-]?|55[ .-]?)?(?:\\([0-9]{2}\\) ?|[0-9]{2}[ .-]?)9?[0-9]{4}[ .-]?[0-9]{4}(?![0-9])"},
+      {"tipo": "telefone", "token": "[telefone removido]", "flags": "",
+       "padrao": "(^|[^0-9.,])9[0-9]{4}[ -][0-9]{4}(?![0-9])"},
+      {"tipo": "telefone", "token": "[telefone removido]", "flags": "i",
+       "padrao": "((?:^|[^a-z])(?:telefone|tel|fone|celular|cel|whatsapp|whats|zap)[ .:]*(?:n[o.]* ?)?)[0-9][0-9 ().-]{6,}[0-9](?![0-9])"},
+      {"tipo": "placa", "token": "[placa removida]", "flags": "",
+       "padrao": "(^|[^A-Za-z0-9])(?!(?:[Jj][Aa][Nn]|[Ff][Ee][Vv]|[Mm][Aa][Rr]|[Aa][Bb][Rr]|[Mm][Aa][Ii]|[Jj][Uu][Nn]|[Jj][Uu][Ll]|[Aa][Gg][Oo]|[Ss][Ee][Tt]|[Oo][Uu][Tt]|[Nn][Oo][Vv]|[Dd][Ee][Zz]|[Nn][Bb][Rr]|[Ii][Ss][Oo]|[Ll][Ee][Ii]|[Aa][Rr][Tt])-?[0-9]{4}(?![0-9A-Za-z]))[A-Za-z]{3}-?[0-9][A-Za-z0-9][0-9]{2}(?![0-9A-Za-z])"}
+    ]
+  },
+  "injecao": {
+    "_leia": "Pré-filtro de alta confiança. Texto alvo = pergunta normalizada e dobrada, depois cada caractere trocado pelo 'mapa' (homóglifos cirílicos/gregos e leet). Exceção: padrões com \"sobre\": \"normalizado\" rodam na pergunta só normalizada (sem dobrar, sem mapa), para casar maiúsculas (DAN). Além disso, cada trecho que casar 'base64.padrao' é decodificado (base64 padrão); se o resultado for UTF-8 válido, ele é normalizado, dobrado, mapeado e testado contra os mesmos padrões 'dobrado'. base64: completa '=' até múltiplo de 4, decodifica em modo estrito (alfabeto padrão; inválido = ignora o trecho) e exige UTF-8 válido (decoder fatal). Qualquer acerto: não chama o modelo e devolve respostas.injecao com tipo fora_de_escopo, confianca alta; log bloqueio=injecao e injecao_regra=id.",
+    "mapa": {
+      "а": "a", "е": "e", "о": "o", "р": "p", "с": "c", "у": "y", "х": "x", "і": "i", "ј": "j", "ѕ": "s", "ԁ": "d", "ɡ": "g", "ո": "n", "ν": "v", "ο": "o", "α": "a", "ε": "e", "ι": "i", "κ": "k", "ρ": "p", "τ": "t", "υ": "u",
+      "0": "o", "1": "i", "3": "e", "4": "a", "5": "s", "7": "t", "@": "a", "$": "s"
+    },
+    "base64": {"padrao": "[A-Za-z0-9+/]{16,}={0,2}", "flags": ""},
+    "padroes": [
+      {"id": "ignorar_regras_qualificadas", "flags": "",
+       "padrao": "\\b(?:ignor|desconsider|esquec|despre[zs]|descart|burl|contorn)[a-z]*\\s+(?:(?:todas|todos|quaisquer|qualquer|as|os|a|o|suas|seus|tuas|teus|essas|esses|estas|estes|minhas|nossas)\\s+){0,3}(?:instrucoes|instrucao|regras|diretrizes|orientacoes|restricoes|comandos|prompts?|ordens|politicas)\\s+(?:anteriores|acima|previas|iniciais|originais|internas|de sistema|do sistema|recebidas|que (?:voce|vc|te) (?:recebeu|deram|passaram))"},
+      {"id": "ignorar_suas_regras", "flags": "",
+       "padrao": "\\b(?:ignore|ignorem|ignora|ignorar|desconsidere|desconsiderem|desconsidera|desconsiderar|esqueca|esquecam|esquece|esquecer|despreze|desprezem|descarte|burle|contorne)\\s+(?:(?:todas|todos|quaisquer)\\s+(?:as\\s+|os\\s+)?|(?:as\\s+|os\\s+)?(?:suas|seus|tuas|teus)\\s+)(?:instrucoes|instrucao|regras|diretrizes|orientacoes|restricoes|comandos|prompts?|ordens|politicas|limites)"},
+      {"id": "ignorar_no_inicio_da_frase", "flags": "",
+       "padrao": "(?:^|[.!?;:\\n]\\s*)(?:(?:por favor|agora|entao|ok|pf)[,\\s]+)?(?:ignore|ignorem|ignora|desconsidere|desconsidera|esqueca|esquece|esquecam)\\s+(?:(?:as|os)\\s+)?(?:instrucoes|regras|diretrizes|restricoes|orientacoes|prompts?)\\b"},
+      {"id": "ignorar_tudo_acima", "flags": "",
+       "padrao": "\\b(?:ignore|ignora|ignorar|desconsidere|esqueca|esquece)\\s+tudo\\s+(?:o que (?:foi dito|te disseram|voce recebeu)\\s+)?(?:acima|antes|anteriormente|ate aqui)"},
+      {"id": "prompt_de_sistema", "flags": "",
+       "padrao": "\\bprompt\\s+(?:de|do)\\s+sistema\\b|\\bsystem\\s*prompt\\b|\\b(?:seu|teu|o seu|o teu)\\s+prompt\\b|\\bprompt\\s+(?:inicial|original|oculto|secreto|interno|completo)\\b"},
+      {"id": "revelar_instrucoes", "flags": "",
+       "padrao": "\\b(?:mostre|mostra|revele|revela|repita|repete|imprima|exiba|copie|cole|transcreva|vaze|liste|escreva|diga|traduza|me (?:de|da|passe|passa|mostre|mostra|diga|conte))\\s+(?:(?:pra|para) mim\\s+)?(?:(?:o|a|os|as|seu|sua|seus|suas|teu|tua|teus|tuas|todo|toda|todos|todas)\\s+){0,3}(?:instrucoes|regras|diretrizes|orientacoes|configuracoes|configuracao)\\s+(?:internas|ocultas|secretas|iniciais|originais|que (?:voce|vc|te) (?:recebeu|deram|passaram))"},
+      {"id": "revelar_suas_instrucoes", "flags": "",
+       "padrao": "\\b(?:mostre|mostra|revele|revela|repita|repete|imprima|exiba|copie|cole|transcreva|vaze|liste|diga|me (?:de|da|passe|passa|mostre|mostra|diga|conte))\\s+(?:(?:pra|para) mim\\s+)?(?:todas\\s+)?(?:as\\s+|os\\s+)?(?:suas|seus|tuas|teus)\\s+(?:instrucoes|regras|diretrizes|orientacoes|configuracoes)\\b"},
+      {"id": "repetir_texto_acima", "flags": "",
+       "padrao": "\\b(?:repita|repete|mostre|mostra|imprima|copie|cole|transcreva|escreva|reproduza)\\s+(?:tudo|todo o texto|o texto|as mensagens|a mensagem|as linhas|o conteudo)\\s+(?:que (?:esta|veio)\\s+)?(?:acima|anterior|anteriores|antes|desde o inicio)"},
+      {"id": "mudar_papel", "flags": "",
+       "padrao": "\\b(?:voce|vc|tu)\\s+agora\\s+(?:e|eh|es|sera|vai ser|passa a ser)\\s+(?:um|uma|o|a|meu|minha|dan|livre|irrestrit[a-z]*|sem)\\b|\\bagora\\s+(?:voce|vc|tu)\\s+(?:e|eh|es|sera|vai ser|passa a ser)\\s+(?:um|uma|o|a|meu|minha|dan|livre|irrestrit[a-z]*|sem)\\b|\\ba partir de agora,?\\s+(?:voce|vc|tu)\\s+(?:e|eh|es|sera|vai ser|passa a ser|deve|vai responder|responde)\\b"},
+      {"id": "fingir_papel", "flags": "",
+       "padrao": "\\b(?:finja|finge|fingir|simule ser|imagine que (?:voce|vc) (?:e|eh|seja))\\b|\\b(?:aja|atue|comporte-se|se comporte)\\s+como\\s+(?:se\\s+(?:fosse|voce fosse)\\s+)?(?:um|uma|o|a)\\b|\\b(?:assuma|interprete|faca|desempenhe)\\s+o\\s+papel\\b|\\brole[ -]?play\\b"},
+      {"id": "modo_irrestrito", "flags": "",
+       "padrao": "\\b(?:modo|mode)\\s+(?:desenvolvedor|developer|dev|deus|god|debug|admin|administrador|irrestrito|livre|sem (?:filtros?|restricoes|regras|censura|limites))\\b|\\b(?:assistente|ia|bot|modelo|chatbot)\\s+sem\\s+(?:regras|filtros?|restricoes|censura|limites)\\b|\\bdo anything now\\b|\\bjail\\s*break"},
+      {"id": "dan", "flags": "", "sobre": "normalizado",
+       "padrao": "\\bD\\.?A\\.?N\\b"},
+      {"id": "tag_falsa", "flags": "",
+       "padrao": "pergunta_do_usuario|[<\\u2039\\u2329\\u3008\\u00ab\\[]\\s*/?\\s*(?:contexto|system|sistema|assistant|assistente|user|usuario|instructions|instrucoes|inst|sys)\\s*[>\\u203a\\u232a\\u3009\\u00bb\\]]|<\\|?im_(?:start|end)\\|?>|<<\\s*sys\\s*>>|(?:^|\\n)\\s*(?:system|assistant|developer)\\s*:"},
+      {"id": "obedecer_texto_codificado", "flags": "",
+       "padrao": "\\b(?:decodifique|decodifica|traduza|leia)\\b[^\\n]*?\\b(?:faca|execute|siga|obedeca|cumpra)\\s+(?:exatamente\\s+)?o que\\s+(?:ele|ela|isso|o texto|a mensagem)\\s+(?:manda|diz|pede)"},
+      {"id": "resposta_forjada", "flags": "",
+       "padrao": "\\bresponda\\s+(?:exatamente|apenas|somente|so)\\s+(?:com\\s+)?(?:este|esse|o seguinte|com o seguinte)\\s+json\\b"},
+      {"id": "ingles_ignorar", "flags": "",
+       "padrao": "\\b(?:ignore|disregard|forget|bypass|override)\\s+(?:(?:all|any|every|the|your|my|these|those|previous|prior|above|earlier|preceding|initial|original|system)\\s+){0,4}(?:instructions?|rules|prompts?|directives|guidelines|guardrails|restrictions)\\b"},
+      {"id": "ingles_papel", "flags": "",
+       "padrao": "\\b(?:you are|you're|youre)\\s+now\\b|\\bfrom now on,?\\s+you\\b|\\bpretend (?:to be|you are|you're)\\b|\\bact as (?:an? |the )?(?:unfiltered|unrestricted|jailbroken|evil|uncensored)\\b"},
+      {"id": "ingles_revelar", "flags": "",
+       "padrao": "\\b(?:reveal|show|print|repeat|output|display|leak|dump|tell me)\\s+(?:me\\s+)?(?:(?:your|the|this|all|full|entire|initial|original|hidden|system|above|previous)\\s+){1,4}(?:prompt|instructions|rules|message|text)\\b"}
+    ]
+  },
+  "vazamento": {
+    "_leia": "Vazamento do prompt: pega a seção de sistema.md que começa na linha 'secao' e vai até a próxima linha iniciada por '## '. Palavras = sequências [a-z0-9]+ do texto dobrado. Se 'resposta' ou 'acao_sugerida' (cada campo separado) tiver n_palavras palavras consecutivas idênticas a n_palavras consecutivas da seção, é vazamento — exceto n-gramas que também aparecem no texto público passado junto (o contexto da pergunta, que inclui o manual) ou em algum item de 'permitidos' (frases das regras que o modelo deve mesmo dizer ao usuário). Acerto: troca por respostas.vazamento (fora_de_escopo, confianca baixa, listas vazias).",
+    "secao": "## Regras",
+    "n_palavras": 8,
+    "permitidos": [
+      "O índice indica onde um abrigo inteligente ajuda mais; ele não diz que um lugar ou seus moradores são perigosos.",
+      "Ao falar de dados de crime, lembre que boletins de ocorrência têm viés de notificação.",
+      "Nunca peça, repita, deduza ou registre dados pessoais (nome, documento, telefone, placa, aparência ou descrição física de alguém).",
+      "Qualquer sugestão de patrulhamento, acionamento de guarda/polícia ou intervenção em campo: a decisão é sempre de um operador humano.",
+      "Leituras de sensores são simuladas nesta versão de demonstração."
+    ]
+  },
+  "estigma": {
+    "_leia": "Afirmações que rotulam lugares/pessoas. Roda em 'resposta' e depois em 'acao_sugerida', cada uma separada, na forma dobrada. Espaço nos padrões é a classe [\\s\\u001c-\\u001f\\u0085\\ufeff] (união do \\s do Python com o do JS: a saída do modelo não passa pela normalização); padrões com \"sobre\": \"normalizado\" rodam no texto em NFC sem dobrar (para distinguir 'é' de 'e'), e a janela/negação/aspas usam o trecho anterior dobrado. Um acerto é ignorado se (a) a frase até o início do acerto (cortada no último caractere de 'fim_de_frase') tiver, nas últimas 'janela' palavras [a-z0-9]+, uma palavra de 'negacao'; ou (b) o próprio trecho casado contiver uma palavra de 'negacao'; ou (c) o número de caracteres de 'aspas' antes do acerto for ímpar (trecho citado entre aspas). Acerto válido: resposta = respostas.estigma, tipo mantido, confianca baixa, pontos_citados [] , acao_sugerida null, fontes = ['manual#indice'] se esse rótulo estiver no contexto, senão [].",
+    "negacao": ["nao", "nem", "nunca", "jamais", "tampouco"],
+    "janela": 6,
+    "fim_de_frase": "[.!?;:\\n]",
+    "aspas": "\"“”«»",
+    "padroes": [
+      {"id": "sujeito_e_perigoso", "flags": "",
+       "padrao": "\\b(?:distritos?|bairros?|regioes|regiao|areas?|zonas?|locais|local|lugar(?:es)?|comunidades?|favelas?|quebradas?|pontos?|ruas?|avenidas?|vilas?|periferias?|moradores|morador(?:as)?|populacao|pessoas|gente|povo|habitantes|jovens)\\b(?:[\\s\\u001c-\\u001f\\u0085\\ufeff]+[a-z0-9-]+){0,4}?[\\s\\u001c-\\u001f\\u0085\\ufeff]+(?:e|eh|sao|esta|estao|fica|ficam|continua|continuam|parece|parecem)[\\s\\u001c-\\u001f\\u0085\\ufeff]+(?:(?:o|a|os|as|um|uma|muito|mais|bem|extremamente|super|realmente|bastante|tao|considerad[oa]s?)[\\s\\u001c-\\u001f\\u0085\\ufeff]+){0,3}(?:perigos[oa]s?|violent[oa]s?|criminos[oa]s?|barra[ -]pesada|mal[ -]frequentad[oa]s?|antros?)\\b"},
+      {"id": "e_o_bairro_perigoso", "flags": "",
+       "padrao": "\\b(?:e|eh|sao)[\\s\\u001c-\\u001f\\u0085\\ufeff]+(?:o|a|os|as|um|uma)[\\s\\u001c-\\u001f\\u0085\\ufeff]+(?:distritos?|bairros?|regioes|regiao|areas?|zonas?|lugar(?:es)?|locais|local|pontos?)[\\s\\u001c-\\u001f\\u0085\\ufeff]+(?:(?:mais|muito|bem)[\\s\\u001c-\\u001f\\u0085\\ufeff]+)?(?:perigos|violent|criminos)[a-z]*"},
+      {"id": "lugar_perigoso", "flags": "",
+       "padrao": "\\b(?:distritos?|bairros?|regioes|regiao|areas?|zonas?|lugar(?:es)?|locais|comunidades?|favelas?|ruas?|quebradas?)[\\s\\u001c-\\u001f\\u0085\\ufeff]+(?:(?:mais|muito|bem)[\\s\\u001c-\\u001f\\u0085\\ufeff]+)?(?:perigos[oa]s?|violent[oa]s?|criminos[oa]s?|mal[ -]frequentad[oa]s?)\\b"},
+      {"id": "lugar_de_bandido", "flags": "",
+       "padrao": "\\b(?:lugar(?:es)?|areas?|bairros?|regioes|regiao|zonas?|terra|antro|ninho|reduto|covil|ponto)[\\s\\u001c-\\u001f\\u0085\\ufeff]+de[\\s\\u001c-\\u001f\\u0085\\ufeff]+(?:bandid|marginal|marginais|vagabund|ladr|traficant|criminos|maloqueir|noia)[a-z]*"},
+      {"id": "area_de_risco", "flags": "",
+       "padrao": "\\b(?:areas?|zonas?)[\\s\\u001c-\\u001f\\u0085\\ufeff]+de[\\s\\u001c-\\u001f\\u0085\\ufeff]+risco\\b"},
+      {"id": "pessoas_perigosas", "flags": "",
+       "padrao": "\\b(?:moradores|morador(?:as)?|pessoas?|populacao|gente|povo|habitantes|jovens|frequentadores)\\b(?:[\\s\\u001c-\\u001f\\u0085\\ufeff]+[a-z0-9-]+){0,4}?[\\s\\u001c-\\u001f\\u0085\\ufeff]+(?:e|eh|sao|parece|parecem)[\\s\\u001c-\\u001f\\u0085\\ufeff]+(?:(?:muito|mais|bem|os|as)[\\s\\u001c-\\u001f\\u0085\\ufeff]+)?(?:perigos|violent|criminos|bandid|marginai|vagabund|suspeit)[a-z]*"},
+      {"id": "predicado_sem_sujeito", "flags": "i", "sobre": "normalizado",
+       "padrao": "(?:^|[\\s\\u001c-\\u001f\\u0085\\ufeff,.;:!?\"'(\u201c\u00ab-])(?:é|são|está|estão)[\\s\\u001c-\\u001f\\u0085\\ufeff]+(?:(?:o|a|os|as|um|uma|muito|mais|bem|extremamente|realmente|bastante|tão)[\\s\\u001c-\\u001f\\u0085\\ufeff]+){0,3}(?:perigos|violent|criminos)[a-z]*"},
+      {"id": "tem_mais_bandido", "flags": "",
+       "padrao": "\\b(?:tem|ha|existem?|concentra|concentram)[\\s\\u001c-\\u001f\\u0085\\ufeff]+(?:mais|muitos?|muitas?)[\\s\\u001c-\\u001f\\u0085\\ufeff]+(?:bandid|marginai|criminos|vagabund|ladr|traficant)[a-z]*"},
+      {"id": "bandidos_ficam_em", "flags": "",
+       "padrao": "\\b(?:bandid|marginai|criminos|vagabund|ladr|traficant)[a-z]*[\\s\\u001c-\\u001f\\u0085\\ufeff]+(?:estao|ficam|se concentram|moram|vivem|agem|atuam)[\\s\\u001c-\\u001f\\u0085\\ufeff]+(?:em|na|no|nas|nos)\\b"},
+      {"id": "evite_regiao", "flags": "",
+       "padrao": "\\bevit(?:e|ar|em)[\\s\\u001c-\\u001f\\u0085\\ufeff]+(?:(?:o|a|os|as|esse|essa|este|esta)[\\s\\u001c-\\u001f\\u0085\\ufeff]+)?(?:distritos?|bairros?|regioes|regiao|areas?|zonas?|comunidades?|favelas?|periferias?)\\b"}
+    ]
+  },
+  "acao_de_campo": {
+    "_leia": "Se 'acao_sugerida' (texto original, não dobrado) casar, precisa_humano vira true. Regex herdada de llm.py (_ACAO_DE_CAMPO).",
+    "padrao": "patrulh|guarda|pol[ií]cia|viatura|\\bGCM\\b|ronda|acionar equipe",
+    "flags": "i"
+  },
+  "consistencia": {
+    "_leia": "Respostas com tipo nesta lista saem com pontos_citados = [] e acao_sugerida = null (fontes e precisa_humano ficam como estão).",
+    "tipos_sem_pontos_nem_acao": ["fora_de_escopo", "erro"]
+  },
+  "respostas": {
+    "_leia": "Textos fixos devolvidos pelos guardrails (idênticos nas duas implementações).",
+    "injecao": "Não posso seguir esse pedido: ele tenta mudar minhas instruções ou revelar configurações internas. Posso ajudar com o painel UrbanCare: como usar as telas, como atender alertas (lotação, escuridão, pessoa sozinha à noite, sensor sem comunicação) e dados do ranking de vulnerabilidade de pontos e distritos.",
+    "vazamento": "Não posso compartilhar as instruções internas do assistente. Posso ajudar com o uso do painel UrbanCare, os alertas e os dados do ranking de vulnerabilidade de pontos e distritos.",
+    "estigma": "Não classifico bairros, distritos ou pessoas como perigosos. O índice do UrbanCare indica onde um abrigo inteligente tende a ajudar mais (pouca iluminação e ocorrências noturnas por perto); ele não mede o caráter de um lugar nem de quem mora ou circula nele. Os boletins de ocorrência também têm viés de notificação: refletem onde há mais registro. Posso mostrar o ranking ou os dados de um ponto ou distrito."
+  }
+}

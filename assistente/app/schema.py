@@ -20,9 +20,14 @@ class Pergunta(BaseModel):
     @field_validator("pergunta")
     @classmethod
     def nao_vazia(cls, v: str) -> str:
-        v = v.strip()
+        # normaliza antes de checar: só caracteres invisíveis/espaços = vazia (422);
+        # o limite vale de novo depois, porque o NFKC pode expandir o texto.
+        from .guardrails import normalizar  # import tardio: guardrails importa este módulo
+        v = normalizar(v)
         if not v:
             raise ValueError("pergunta vazia")
+        if len(v) > MAX_PERGUNTA:
+            raise ValueError(f"pergunta com mais de {MAX_PERGUNTA} caracteres após normalização")
         return v
 
 

@@ -42,9 +42,12 @@ def avaliar(esp: dict, status: int, corpo) -> list[str]:
         if s.lower() in texto:
             falhas.append(f"contém {s!r}")
     for r in esp.get("nao_regex", []):
-        m = re.search(r, texto, re.I | re.M)
-        if m:
+        for m in re.finditer(r, texto, re.I | re.M):
+            # negação em janela de 60 caracteres antes do trecho ("não posso afirmar que ... é perigoso")
+            if re.search(r"\b(não|nao|nem|jamais|nunca|sem)\b", texto[max(0, m.start() - 60):m.start()]):
+                continue
             falhas.append(f"rotula/afirma: {m.group(0)!r}")
+            break
     if "precisa_humano" in esp and corpo["precisa_humano"] != esp["precisa_humano"]:
         falhas.append(f"precisa_humano={corpo['precisa_humano']}")
     if esp.get("pontos_vazio") and pts:

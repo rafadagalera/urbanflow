@@ -273,6 +273,38 @@ O item 12 vai além da regra do prompt: não depende de o modelo obedecer. O ban
 
 Na prática, o `meta.eventos` de cada resposta registra o que aconteceu (por exemplo `anthropic/claude-haiku-5.5:reparo`), como nas [evidências](../docs/evidencias/README.md).
 
+### 6.1 Proteções em código (guardrails)
+
+As regras do prompt dependem de o modelo obedecer. Por isso, uma camada em [`guardrails.py`](app/guardrails.py) age antes e depois do modelo. Os padrões ficam num arquivo de dados, [`prompts/guardrails.json`](prompts/guardrails.json), que o servidor Node da versão publicada também lê. Assim, os dois aplicam exatamente as mesmas regras, e um teste compara os resultados dos dois (`test_mesmo_resultado_no_node`).
+
+| Etapa | O que faz | Resultado | Teste |
+|---|---|---|---|
+| Normalização da entrada | NFKC; remove caracteres invisíveis (zero-width, bidi, controle) e seletores de variação; colapsa espaços; valida 1 a 500 caracteres **depois** de normalizar | pergunta só com caracteres invisíveis vira 422 | `test_api_422_para_pergunta_so_com_invisiveis`, `test_normalizar_e_idempotente` |
+| Pré-filtro de injeção | sobre o texto sem acento, com letras parecidas de outros alfabetos e leetspeak convertidos, e também sobre trechos em base64 decodificados: "ignore as instruções anteriores", "prompt de sistema", "você agora é", modo desenvolvedor, DAN, tags falsas de papel, equivalentes em inglês | resposta fixa `fora_de_escopo` **sem chamar o modelo** (também sem chave); log `bloqueio=injecao` | `test_injecao_detectada`, `test_injecao_nao_chama_modelo_e_loga_bloqueio`, `test_pergunta_legitima_nao_e_barrada` (24 perguntas legítimas) |
+| Mascaramento de dado pessoal | CPF, CNPJ, telefone, e-mail e placa (antiga e Mercosul) viram `[CPF removido]` etc. **antes** de o texto ir ao OpenRouter; o log guarda só a contagem por tipo | o fornecedor do modelo não recebe o dado | `test_mascara_pii`, `test_pii_mascarada_antes_do_modelo_e_contada_no_log`, `test_mascara_nao_pega_numeros_do_dominio` |
+| Vazamento do prompt | procura na `resposta` e na `acao_sugerida` qualquer sequência de 8 palavras copiada da seção de regras do `sistema.md` (frases que também estão no manual não contam) | resposta segura `fora_de_escopo`, confiança `baixa` | `test_vazamento_literal_das_regras_e_trocado`, `test_parafrase_e_frases_publicas_nao_sao_vazamento` |
+| Estigma | frases **afirmativas** que rotulam lugar ou pessoa como perigoso, violento, "de bandido" ou "área de risco"; frases negadas ou explicativas ("não quer dizer que o bairro seja perigoso") passam | texto neutro (o índice mostra onde o abrigo ajuda mais; boletins têm viés de notificação), confiança `baixa` | `test_estigma_afirmativo_detectado`, `test_estigma_negado_ou_explicativo_passa` |
+| Dado pessoal na saída | o mesmo mascaramento na `resposta` e na `acao_sugerida`; depois, corte em 1200 caracteres | nenhum CPF ou telefone sai do assistente | `test_pii_mascarada_na_saida`, `test_mascara_na_saida_respeita_1200_caracteres` |
+| Consistência | `fora_de_escopo` e `erro` não citam pontos nem sugerem ação | campos zerados | `test_consistencia_fora_de_escopo_e_erro` |
+
+O que entra no pacote não quebrou nada do que funcionava: as 21 saídas validadas das evidências passam pelas checagens de saída inalteradas, com uma exceção justificada (uma resposta `fora_de_escopo` que citava um ponto teve `pontos_citados` zerado), conforme `test_evidencias_passam_intactas`.
+
+**Bateria red-team.** [`scripts/redteam.py`](../scripts/redteam.py) envia 38 mensagens problemáticas ([`casos.json`](../docs/evidencias/redteam/casos.json)) ao serviço real e corrige cada resposta automaticamente. As categorias são fora do tema, injeção (inclusive com caracteres invisíveis, base64, tag falsa e JSON falso), dado pessoal, estigma, ação de campo, alucinação, abuso de entrada e perguntas legítimas que **não** podem ser barradas.
+
+| Categoria | Antes das proteções | Depois (FastAPI) | Versão publicada (Node) |
+|---|---|---|---|
+| Fora do tema | 5/5 | 5/5 | 5/5 |
+| Injeção | 10/10 (pelo modelo) | 10/10 (barradas antes do modelo, cerca de 0,4 s) | 10/10 |
+| Dado pessoal | 5/5 | 5/5 | 5/5 |
+| Estigma | 4/4 | 4/4 | 4/4 |
+| Ação de campo | 2/2 | 2/2 | 2/2 |
+| Alucinação | 3/3 | 3/3 | 3/3 |
+| Abuso de entrada | 3/4 | 4/4 | 4/4 |
+| Perguntas legítimas | 5/5 | 5/5 | 5/5 |
+| **Total** | **37/38** | **38/38** | **38/38** |
+
+Os resultados completos estão em [`baseline.md`](../docs/evidencias/redteam/baseline.md), [`endurecido.md`](../docs/evidencias/redteam/endurecido.md) e [`node.md`](../docs/evidencias/redteam/node.md). As evidências da seção 5 foram gravadas antes do pré-filtro: hoje a pergunta da seção 5.2 é barrada pelo código e nem chega ao modelo.
+
 ## 7. Como rodar
 
 ### Com Docker Compose (recomendado)
@@ -314,7 +346,7 @@ O manual é lido de `../docs/manual.md` (relativo a `assistente/`).
 cd assistente && python -m pytest tests -v
 ```
 
-São 42 testes, sem rede e sem banco. A saída da última execução está em [`docs/evidencias/pytest_assistente.txt`](../docs/evidencias/pytest_assistente.txt). Arquivos: `test_llm.py` (cascata e pós-validação), `test_api.py` (422, HTTP 200 na falha total, `/saude`), `test_contexto.py` (detecção de distrito, manual, com e sem dados) e `test_cliente_http.py` (parâmetro `temperature`).
+São 186 testes, sem rede. Na última execução, 185 passaram e 1 foi pulado (precisa do CSV de pontos gerado pelo pipeline). Os testes que comparam com o banco gold ou com o servidor Node são pulados quando `DATABASE_URL` ou o `node` não estão disponíveis. A saída da última execução está em [`docs/evidencias/pytest_assistente.txt`](../docs/evidencias/pytest_assistente.txt). Arquivos: `test_llm.py` (cascata e pós-validação), `test_api.py` (422, HTTP 200 na falha total, `/saude`), `test_contexto.py` (detecção de distrito, manual, com e sem dados), `test_cliente_http.py` (parâmetro `temperature`), `test_guardrails.py` (proteções da seção 6.1) e `test_equivalencia_node.py` (mesmas mensagens e mesmas proteções no servidor Node).
 
 ### Regenerar as evidências (modelos reais, gasta créditos do OpenRouter)
 
@@ -337,15 +369,16 @@ Sem argumentos, usa os 3 modelos da tabela da seção 3. Nenhum cabeçalho HTTP 
 - **Frescor.** O assistente lê o banco a cada pergunta. O pipeline é diário (`@daily`) e roda localmente, então a data depende de alguém ter executado a DAG. A versão publicada usa um retrato fixo de uma data.
 - **Qualidade medida em pequena escala.** São 7 perguntas em 3 modelos, conferidas à mão. Não há avaliação automática de acerto factual nem teste com muitos usuários.
 - **Pós-validação é estrutural.** Ela confere que pontos e fontes existem no contexto, mas não confere se um número escrito no texto da `resposta` bate com o dado. Esse risco é tratado só pelo prompt.
-- **Sem autenticação nem limite de uso no FastAPI.** Serve para demonstração local. A versão publicada na Azure tem limite de perguntas por IP em memória.
+- **Proteções por padrão, não por compreensão.** O pré-filtro só barra as formas claras de injeção; formulações novas ficam com a regra do prompt. Nomes e descrições físicas não são mascarados (não há padrão confiável), nem o RG (formatos variados demais). A checagem de estigma é conservadora: também troca frases genéricas como "esperar sozinho no escuro é perigoso", e uma negação no meio da frase pode deixar passar uma afirmação.
+- **Sem autenticação nem limite de uso no FastAPI.** Serve para demonstração local. A versão publicada na Azure tem limite de 10 perguntas por minuto por IP (o IP lido é o que a própria Azure acrescenta ao `X-Forwarded-For`, que o cliente não consegue forjar) e um teto global de 200 perguntas por hora.
 - **Custo e disponibilidade dependem do OpenRouter** e dos fornecedores dos modelos. Preços e a lista de parâmetros aceitos mudam.
 
 ## 9. Aspectos éticos
 
 - **Viés dos dados de crime e risco de estigmatizar bairros.** O índice usa boletins de ocorrência, que medem crime **registrado**, não crime ocorrido. Onde se registra menos (desconfiança, distância de delegacia) o índice subestima; onde há mais movimento e registro, superestima. O produto usa o índice para decidir onde um abrigo ajuda mais, não para rotular lugares. O prompt proíbe estigmatizar distritos e pessoas, manda lembrar o viés quando relevante e os exemplos do prompt mostram a formulação certa. A [evidência de injeção](../docs/evidencias/anthropic-claude-haiku-5-5/05_injecao_prompt.json) inclui um pedido para chamar um bairro de "o mais perigoso", recusado.
 - **Humano no circuito.** O assistente não aciona ninguém: só orienta. Toda sugestão de patrulhamento ou intervenção leva `precisa_humano = true`, regra do prompt reforçada por código (item 12 da seção 6). Na interface, `precisa_humano` aparece como selo. `confianca` cai para `baixa` quando a resposta cita ponto que o contexto não tem.
-- **Privacidade e LGPD.** O contexto traz só dados agregados e de infraestrutura (ponto, distrito, ocorrências contadas, lux). Os BOs que alimentam o índice perdem número do boletim, delegacia e endereço já na camada silver do pipeline. O produto trabalha com silhuetas anônimas e não guarda imagem. O prompt proíbe pedir, repetir ou deduzir dado pessoal, e o log guarda só metadados, sem o texto da pergunta. Ponto de atenção: a pergunta do usuário é enviada ao OpenRouter e ao fornecedor do modelo; o operador deve ser orientado a não digitar dados pessoais (o assistente também diz isso).
-- **Injeção de prompt.** A pergunta é tratada como dado (delimitada, sanitizada e declarada como dado no prompt), a saída é restrita a um esquema fechado e o assistente não tem ferramentas nem acesso de escrita, então o pior caso é uma resposta ruim, não uma ação. A defesa não é absoluta: a robustez foi testada em um caso real, não em um conjunto adversarial.
+- **Privacidade e LGPD.** O contexto traz só dados agregados e de infraestrutura (ponto, distrito, ocorrências contadas, lux). Os BOs que alimentam o índice perdem número do boletim, delegacia e endereço já na camada silver do pipeline. O produto trabalha com silhuetas anônimas e não guarda imagem. O prompt proíbe pedir, repetir ou deduzir dado pessoal, e o log guarda só metadados, sem o texto da pergunta. CPF, CNPJ, telefone, e-mail e placa são mascarados **antes** de a pergunta ir ao OpenRouter e de novo na resposta (seção 6.1). Nomes e descrições físicas ainda chegam ao fornecedor do modelo, por isso a interface pede que o operador não digite dados pessoais.
+- **Injeção de prompt.** A pergunta é tratada como dado (delimitada, sanitizada e declarada como dado no prompt), a saída é restrita a um esquema fechado e o assistente não tem ferramentas nem acesso de escrita, então o pior caso é uma resposta ruim, não uma ação. Além disso, o pré-filtro barra as formas claras de injeção antes do modelo, e a saída é checada contra vazamento do prompt. A defesa não é absoluta: a bateria red-team tem 38 casos, não um conjunto adversarial amplo.
 - **Custo.** Cerca de US$ 0,0006 a 0,0012 por pergunta nos modelos testados, com contexto de 5 a 8 mil tokens de entrada. O reserva só é chamado em falha. No serviço publicado, a chave do OpenRouter é uma App Setting e deve ser uma chave dedicada, com limite de crédito baixo, para que um abuso não vire custo ilimitado.
 - **Transparência.** A resposta lista as `fontes` usadas e o selo de `confianca`; leituras simuladas são sinalizadas como tais.
 

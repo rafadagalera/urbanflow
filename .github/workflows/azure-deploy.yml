@@ -33,6 +33,7 @@ jobs:
           cp -r web/public deploy_dist/dist
           cp web/server.mjs web/contexto.json deploy_dist/
           cp assistente/prompts/sistema.md deploy_dist/sistema.md
+          cp assistente/prompts/guardrails.json deploy_dist/guardrails.json
           cat << 'EOF' > deploy_dist/package.json
           {
             "name": "urbancare-azure-production",

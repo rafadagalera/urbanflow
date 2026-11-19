@@ -4,6 +4,11 @@ Ordem por modelo: json_schema → (400 de formato) json_object → extração to
 validação Pydantic → 1 reparo com o erro → próximo modelo. 429/5xx: 1 retentativa
 curta; timeout ou falha persistente: modelo reserva. Tudo falhou: Resposta de erro.
 O log guarda só metadados — nunca o texto da pergunta ou da resposta.
+
+Guardrails de código (guardrails.py, regras em prompts/guardrails.json): a pergunta é
+normalizada e tem dados pessoais mascarados antes de ir ao modelo; injeção evidente é
+barrada sem chamar o modelo; a saída passa por vazamento do prompt, estigma, máscara
+de dados pessoais e consistência depois da pós-validação.
 """
 from __future__ import annotations
 
@@ -16,6 +21,7 @@ from dataclasses import dataclass, field
 import httpx
 from pydantic import ValidationError
 
+from . import guardrails
 from .config import Config
 from .contexto import Contexto
 from .schema import JSON_SCHEMA, Resposta, resposta_erro
@@ -24,7 +30,6 @@ log = logging.getLogger("assistente")
 
 TRANSITORIOS = {429, 500, 502, 503, 504}
 ESPERA_RETENTATIVA_S = 1.5
-_ACAO_DE_CAMPO = re.compile(r"patrulh|guarda|pol[ií]cia|viatura|\bGCM\b|ronda|acionar equipe", re.I)
 
 
 class ErroLLM(Exception):
@@ -134,7 +139,7 @@ def pos_validar(r: Resposta, ctx: Contexto) -> tuple[Resposta, list[str]]:
     fontes = [f for f in r.fontes if f in ctx.fontes]
     if len(fontes) != len(r.fontes):
         avisos.append(f"fontes_removidas={len(r.fontes) - len(fontes)}")
-    humano = r.precisa_humano or bool(_ACAO_DE_CAMPO.search(r.acao_sugerida or ""))
+    humano = r.precisa_humano or guardrails.exige_humano(r.acao_sugerida)
     if humano and not r.precisa_humano:
         avisos.append("precisa_humano_forcado")
     return r.model_copy(update={"pontos_citados": pontos, "fontes": fontes, "confianca": confianca,
@@ -196,7 +201,17 @@ class Assistente:
         t0 = time.monotonic()
         meta = {"modelo": None, "chamadas": 0, "eventos": [], "tokens_entrada": 0, "tokens_saida": 0,
                 "custo_usd": 0.0, "status": "erro", "tem_dados": ctx.tem_dados}
-        mensagens = montar_mensagens(self.sistema, ctx, pergunta)
+        # pré-filtro antes de tudo (inclusive do "sem chave"): injeção evidente não gasta chamada
+        regra = guardrails.detectar_injecao(pergunta)
+        if regra:
+            meta.update(status="bloqueado", bloqueio="injecao", injecao_regra=regra)
+            res = Resultado(guardrails.resposta_bloqueio(), meta)
+            self._log(meta, t0)
+            return res
+        preparada = guardrails.preparar_pergunta(pergunta)  # normaliza e mascara (LGPD)
+        if preparada.pii:
+            meta["pii_entrada"] = preparada.pii  # só contagens por tipo, nunca os valores
+        mensagens = montar_mensagens(self.sistema, ctx, preparada.texto)
         brutos: list[str] = []
         if not self.cfg.api_key:
             meta["status"] = "sem_chave"
@@ -219,6 +234,8 @@ class Assistente:
             res = Resultado(resposta_erro(), meta, mensagens, brutos)
         else:
             resposta, avisos = pos_validar(resposta, ctx)
+            meta["eventos"] += avisos
+            resposta, avisos = guardrails.verificar_saida(resposta, self.sistema, ctx.texto, ctx.fontes)
             meta["eventos"] += avisos
             meta["status"] = "ok"
             res = Resultado(resposta, meta, mensagens, brutos)

@@ -241,6 +241,269 @@ export function validarResposta(entrada) {
 const ordenar = (r) => Object.fromEntries(CAMPOS.map((c) => [c, r[c]]));
 
 // ---------------------------------------------------------------------------
+// Guardrails (espelho de assistente/app/guardrails.py; regras em guardrails.json)
+// ---------------------------------------------------------------------------
+// Padrões no subconjunto comum de Python re e JS RegExp, compilados com flags + 'g'
+// e SEM a flag 'u' (é o que o guardrails.json pede). Tudo que é global passa por
+// `buscar`, que zera lastIndex: test() com 'g' guarda estado entre chamadas.
+
+const reG = (padrao, flags = '') => {
+  if (/[^i]/.test(flags)) throw new Error(`flag de regex não suportada: ${flags}`);
+  return new RegExp(padrao, `${flags}g`);
+};
+const buscar = (re, t) => {
+  re.lastIndex = 0;
+  return re.test(t);
+};
+const PALAVRAS_ASCII = /[a-z0-9]+/g;
+const palavrasDe = (t) => t.match(PALAVRAS_ASCII) || [];
+
+/** Compila o guardrails.json (mesmos campos de Regras no Python). */
+export function compilarGuardrails(d) {
+  const passos = d.normalizacao.passos.map((p) => {
+    if (p.tipo === 'regex') return ['regex', reG(p.padrao, p.flags || ''), p.por];
+    if (p.tipo === 'unicode') return ['unicode', p.forma, null];
+    if (p.tipo === 'remover_categorias') {
+      const classe = new RegExp(`[${p.categorias.map((c) => `\\p{${c}}`).join('')}]`, 'gu');
+      return ['categorias', classe, new Set(p.manter || [])];
+    }
+    if (p.tipo === 'aparar') return ['aparar', null, null];
+    throw new Error(`passo de normalização desconhecido: ${p.tipo}`);
+  });
+  const inj = d.injecao;
+  const est = d.estigma;
+  return {
+    bruto: d,
+    passos,
+    pii: d.pii.padroes.map((p) => [p.tipo, p.token, reG(p.padrao, p.flags || '')]),
+    injecao: inj.padroes.map((p) => [p.id, reG(p.padrao, p.flags || ''), p.sobre || 'dobrado']),
+    mapa: new Map(Object.entries(inj.mapa)),
+    base64: reG(inj.base64.padrao, inj.base64.flags || ''),
+    estigma: est.padroes.map((p) => [p.id, reG(p.padrao, p.flags || ''), p.sobre || 'dobrado']),
+    negacao: new Set(est.negacao),
+    janela: Math.trunc(Number(est.janela)),
+    fimDeFrase: reG(est.fim_de_frase),
+    aspas: Array.from(est.aspas),
+    acaoDeCampo: reG(d.acao_de_campo.padrao, d.acao_de_campo.flags || ''),
+    tiposSemPontos: new Set(d.consistencia.tipos_sem_pontos_nem_acao),
+    respostas: d.respostas,
+    perguntaMax: Math.trunc(Number(d.limites.pergunta_max)),
+    respostaMax: Math.trunc(Number(d.limites.resposta_max)),
+    vazamentoSecao: d.vazamento.secao,
+    vazamentoN: Math.trunc(Number(d.vazamento.n_palavras)),
+    vazamentoPermitidos: d.vazamento.permitidos || [],
+    _segredos: new Map(), // cache de n-gramas por sistema.md
+  };
+}
+
+let _guardrailsPadrao;
+/** guardrails.json do caminho padrão (./guardrails.json no pacote, senão o do assistente). */
+export function guardrailsPadrao() {
+  if (_guardrailsPadrao === undefined) _guardrailsPadrao = carregarGuardrails(caminhosPadrao().guardrails);
+  return _guardrailsPadrao;
+}
+
+export function carregarGuardrails(caminho) {
+  return compilarGuardrails(JSON.parse(fs.readFileSync(caminho, 'utf8')));
+}
+
+/** Aplica os passos de normalizacao.passos, em ordem. */
+export function normalizarEntrada(texto, g) {
+  let t = texto || '';
+  for (const [tipo, a, b] of g.passos) {
+    if (tipo === 'unicode') t = t.normalize(a);
+    else if (tipo === 'regex') t = t.replace(a, () => b); // função: 'por' é literal, sem $1
+    else if (tipo === 'categorias') t = t.replace(a, (c) => (b.has(c) ? c : ''));
+    else t = t.replace(/^[ \n]+|[ \n]+$/g, ''); // aparar: strip(" \n")
+  }
+  return t;
+}
+
+/** Forma só para detecção: sem acentos (NFD sem Mn) e minúscula. */
+export function dobrar(texto) {
+  return (texto || '').normalize('NFD').replace(/\p{Mn}/gu, '').toLowerCase();
+}
+
+/** Troca dados pessoais por tokens. Devolve [texto, contagem por tipo]. */
+export function mascarar(texto, g) {
+  const contagem = {};
+  let t = texto || '';
+  for (const [tipo, token, re] of g.pii) {
+    t = t.replace(re, (_m, g1) => {
+      contagem[tipo] = (contagem[tipo] || 0) + 1;
+      return (g1 || '') + token;
+    });
+  }
+  return [t, contagem];
+}
+
+/** Normaliza e mascara a pergunta antes de montar as mensagens do modelo. */
+export function prepararPergunta(pergunta, g) {
+  const [texto, pii] = mascarar(normalizarEntrada(pergunta, g), g);
+  return { texto, pii };
+}
+
+const mapear = (texto, mapa) => Array.from(texto, (c) => mapa.get(c) ?? c).join('');
+
+// base64.b64decode(s + padding, validate=True) do Python: alfabeto padrão, nº de '=' exato,
+// sem "1 caractere a mais que múltiplo de 4"; bits sobrando no fim são aceitos (como no Python).
+const BASE64_ESTRITO = /^([A-Za-z0-9+/]*)(=*)$/;
+const PAD_EXIGIDO = { 0: 0, 2: 2, 3: 1 };
+const UTF8_ESTRITO = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true });
+
+function decodificados(texto, g) {
+  const saida = [];
+  for (const m of texto.matchAll(g.base64)) {
+    const s = m[0];
+    const p = s + '='.repeat((4 - (s.length % 4)) % 4);
+    const partes = p.match(BASE64_ESTRITO);
+    if (!partes) continue;
+    const resto = partes[1].length % 4;
+    if (!(resto in PAD_EXIGIDO) || partes[2].length !== PAD_EXIGIDO[resto]) continue;
+    try {
+      saida.push(UTF8_ESTRITO.decode(Buffer.from(partes[1], 'base64')));
+    } catch {
+      // não é UTF-8 válido: ignora o trecho
+    }
+  }
+  return saida;
+}
+
+/** id da primeira regra de injeção que casar, ou null. */
+export function detectarInjecao(pergunta, g) {
+  const normalizado = normalizarEntrada(pergunta, g);
+  const alvos = [mapear(dobrar(normalizado), g.mapa),
+    ...decodificados(normalizado, g).map((d) => mapear(dobrar(normalizarEntrada(d, g)), g.mapa))];
+  for (const [id, re, sobre] of g.injecao) {
+    if (sobre === 'normalizado') {
+      if (buscar(re, normalizado)) return id;
+    } else if (alvos.some((a) => buscar(re, a))) {
+      return id;
+    }
+  }
+  return null;
+}
+
+export function respostaBloqueio(g) {
+  return { resposta: g.respostas.injecao, tipo: 'fora_de_escopo', fontes: [], pontos_citados: [],
+    acao_sugerida: null, precisa_humano: false, confianca: 'alta' };
+}
+
+export function exigeHumano(acao, g) {
+  return buscar(g.acaoDeCampo, acao || '');
+}
+
+// str.splitlines() do Python
+const QUEBRAS_PY = /\r\n|[\n\r\v\f\x1c\x1d\x1e\x85\u2028\u2029]/;
+function linhasPy(t) {
+  const l = t.split(QUEBRAS_PY);
+  if (l.length && l.at(-1) === '') l.pop();
+  return l;
+}
+
+function ngramas(palavras, n) {
+  const s = new Set();
+  for (let i = 0; i + n <= palavras.length; i++) s.add(palavras.slice(i, i + n).join(' '));
+  return s;
+}
+
+/** Trecho do sistema.md da linha `## Regras` até a próxima linha `## `. */
+export function secaoRegras(sistema, g) {
+  let dentro = false;
+  const saida = [];
+  for (const ln of linhasPy(sistema || '')) {
+    if (ln.startsWith(g.vazamentoSecao)) {
+      dentro = true;
+      continue;
+    }
+    if (dentro && ln.startsWith('## ')) break;
+    if (dentro) saida.push(ln);
+  }
+  return saida.join('\n');
+}
+
+function ngramasSecretos(sistema, g) {
+  if (!g._segredos.has(sistema)) {
+    const n = g.vazamentoN;
+    const livres = new Set();
+    for (const f of g.vazamentoPermitidos) for (const x of ngramas(palavrasDe(dobrar(f)), n)) livres.add(x);
+    const segredos = new Set([...ngramas(palavrasDe(dobrar(secaoRegras(sistema, g))), n)].filter((x) => !livres.has(x)));
+    g._segredos.set(sistema, segredos);
+  }
+  return g._segredos.get(sistema);
+}
+
+/** true se `texto` repete n palavras seguidas das regras do sistema.md (fora do que é público). */
+export function vazouPrompt(texto, sistema, publico, g) {
+  const segredos = ngramasSecretos(sistema || '', g);
+  if (!segredos.size) return false;
+  let achados = [...ngramas(palavrasDe(dobrar(texto)), g.vazamentoN)].filter((x) => segredos.has(x));
+  if (achados.length && publico) {
+    const pub = ngramas(palavrasDe(dobrar(publico)), g.vazamentoN);
+    achados = achados.filter((x) => !pub.has(x));
+  }
+  return achados.length > 0;
+}
+
+/** id da primeira afirmação estigmatizante não negada nem citada, ou null. */
+export function estigma(texto, g) {
+  const alvos = { dobrado: dobrar(texto), normalizado: (texto || '').normalize('NFC') };
+  for (const [id, re, sobre] of g.estigma) {
+    const t = alvos[sobre];
+    for (const m of t.matchAll(re)) {
+      const antes = dobrar(t.slice(0, m.index));
+      let aspas = 0;
+      for (const c of antes) if (g.aspas.includes(c)) aspas += 1;
+      if (aspas % 2 === 1) continue; // trecho entre aspas: citação, não afirmação
+      const frase = antes.split(g.fimDeFrase).at(-1);
+      const janela = palavrasDe(frase).slice(-g.janela);
+      if (janela.some((p) => g.negacao.has(p)) || palavrasDe(dobrar(m[0])).some((p) => g.negacao.has(p))) continue;
+      return id;
+    }
+  }
+  return null;
+}
+
+// rstrip() do Python
+const RE_RSTRIP = new RegExp(`${ESPACO}+$`, 'u');
+function cortar(texto, limite) {
+  const cp = Array.from(texto);
+  return cp.length <= limite ? texto : cp.slice(0, limite - 1).join('').replace(RE_RSTRIP, '') + '…';
+}
+
+/**
+ * Checagens de saída, depois da pós-validação: vazamento do prompt → estigma → máscara de
+ * dados pessoais → consistência → limite de tamanho. Devolve [resposta, eventos].
+ */
+export function verificarSaida(r, sistema, publico, fontesCtx, g) {
+  const eventos = [];
+  const temFonte = (f) => (fontesCtx instanceof Set ? fontesCtx.has(f) : (fontesCtx || []).includes(f));
+  if (sistema && [r.resposta, r.acao_sugerida || ''].some((c) => vazouPrompt(c, sistema, publico, g))) {
+    eventos.push('vazamento_prompt');
+    r = { ...r, resposta: g.respostas.vazamento, tipo: 'fora_de_escopo', fontes: [], pontos_citados: [],
+      acao_sugerida: null, precisa_humano: false, confianca: 'baixa' };
+  } else {
+    const regra = estigma(r.resposta, g) || estigma(r.acao_sugerida || '', g);
+    if (regra) {
+      eventos.push(`estigma:${regra}`);
+      r = { ...r, resposta: g.respostas.estigma, pontos_citados: [], acao_sugerida: null, confianca: 'baixa',
+        fontes: temFonte('manual#indice') ? ['manual#indice'] : [] };
+    }
+  }
+  const [resposta, n1] = mascarar(r.resposta, g);
+  const [acao, n2] = r.acao_sugerida !== null ? mascarar(r.acao_sugerida, g) : [null, {}];
+  for (const tipo of [...new Set([...Object.keys(n1), ...Object.keys(n2)])].sort()) {
+    eventos.push(`pii_saida:${tipo}=${(n1[tipo] || 0) + (n2[tipo] || 0)}`);
+  }
+  const atualizar = { resposta: cortar(resposta, g.respostaMax), acao_sugerida: acao };
+  if (g.tiposSemPontos.has(r.tipo) && (r.pontos_citados.length || r.acao_sugerida !== null)) {
+    eventos.push(`consistencia_${r.tipo}`);
+    Object.assign(atualizar, { pontos_citados: [], acao_sugerida: null });
+  }
+  return [{ ...r, ...atualizar }, eventos];
+}
+
+// ---------------------------------------------------------------------------
 // Cliente LLM e cascata de falhas (espelho de assistente/app/llm.py)
 // ---------------------------------------------------------------------------
 
@@ -249,8 +512,6 @@ export const ESPERA_RETENTATIVA_S = 1.5;
 const ESPERA_LISTA_MS = 60_000;
 // Teto de tempo de uma pergunta inteira (retentativas + reserva); o widget espera até 150 s.
 export const PRAZO_TOTAL_S = 85;
-const ACAO_DE_CAMPO = new RegExp(
-  `patrulh|guarda|pol[ií]cia|viatura|(?<!${PALAVRA})GCM(?!${PALAVRA})|ronda|acionar equipe`, 'iu');
 
 export class ErroLLM extends Error {
   constructor(status, corpo = '') {
@@ -400,7 +661,7 @@ export function montarMensagens(sistema, ctx, pergunta) {
 }
 
 /** Remove pontos e fontes que não estão no contexto; força humano em ação de campo. */
-export function posValidar(r, ctx) {
+export function posValidar(r, ctx, g = guardrailsPadrao()) {
   const avisos = [];
   const pontos = r.pontos_citados.filter((p) => ctx.pontos.has(p));
   let confianca = r.confianca;
@@ -410,14 +671,16 @@ export function posValidar(r, ctx) {
   }
   const fontes = r.fontes.filter((f) => ctx.fontes.has(f));
   if (fontes.length !== r.fontes.length) avisos.push(`fontes_removidas=${r.fontes.length - fontes.length}`);
-  const humano = r.precisa_humano || ACAO_DE_CAMPO.test(r.acao_sugerida || '');
+  const humano = r.precisa_humano || exigeHumano(r.acao_sugerida, g); // regex de acao_de_campo do JSON
   if (humano && !r.precisa_humano) avisos.push('precisa_humano_forcado');
   return [{ ...r, pontos_citados: pontos, fontes, confianca, precisa_humano: humano }, avisos];
 }
 
 const esperar = (s) => new Promise((ok) => setTimeout(ok, s * 1000));
 
-export function criarAssistente(cfg, cliente, sistema, { dormir = esperar, log = console.log } = {}) {
+export function criarAssistente(cfg, cliente, sistema,
+  { dormir = esperar, log = console.log, guardrails = guardrailsPadrao() } = {}) {
+  const g = guardrails;
   async function chamar(modelo, mensagens, fmt, meta) {
     let transitorioUsado = false;
     for (;;) {
@@ -492,7 +755,16 @@ export function criarAssistente(cfg, cliente, sistema, { dormir = esperar, log =
     // teto da pergunta inteira (não existe no Python): cada chamada usa o menor entre o timeout e o que resta
     Object.defineProperty(meta, '_prazo', { value: t0 + (cfg.prazo_total_s ?? PRAZO_TOTAL_S) * 1000,
       enumerable: false, configurable: true });
-    const mensagens = montarMensagens(sistema, ctx, pergunta);
+    // pré-filtro antes de tudo (inclusive do "sem chave"): injeção evidente não gasta chamada
+    const regra = detectarInjecao(pergunta, g);
+    if (regra) {
+      Object.assign(meta, { status: 'bloqueado', bloqueio: 'injecao', injecao_regra: regra });
+      registrar(meta, t0);
+      return { resposta: ordenar(respostaBloqueio(g)), meta, mensagens: [] };
+    }
+    const preparada = prepararPergunta(pergunta, g); // normaliza e mascara (LGPD)
+    if (Object.keys(preparada.pii).length) meta.pii_entrada = preparada.pii; // só contagens por tipo
+    const mensagens = montarMensagens(sistema, ctx, preparada.texto);
     if (!cfg.api_key) {
       meta.status = 'sem_chave';
       registrar(meta, t0);
@@ -518,8 +790,10 @@ export function criarAssistente(cfg, cliente, sistema, { dormir = esperar, log =
     if (resposta === null) {
       resposta = respostaErro();
     } else {
-      const [validada, avisos] = posValidar(resposta, ctx);
-      resposta = validada;
+      let avisos;
+      [resposta, avisos] = posValidar(resposta, ctx, g);
+      meta.eventos.push(...avisos);
+      [resposta, avisos] = verificarSaida(resposta, sistema, ctx.texto, ctx.fontes, g);
       meta.eventos.push(...avisos);
       meta.status = 'ok';
     }
@@ -561,7 +835,7 @@ const MIME = {
   '.webmanifest': 'application/manifest+json',
 };
 // Nunca servidos, mesmo que alguém os copie para a pasta estática.
-const PROIBIDOS = new Set(['server.mjs', 'contexto.json', 'sistema.md', 'package.json']);
+const PROIBIDOS = new Set(['server.mjs', 'contexto.json', 'sistema.md', 'guardrails.json', 'package.json']);
 
 export const LIMITE_POR_MINUTO = 10;
 export const LIMITE_GLOBAL_HORA = 200;
@@ -649,7 +923,7 @@ function lerCorpo(req) {
 }
 
 /** Valida o corpo como o FastAPI + Pydantic validam `Pergunta` (mesmo formato de erro 422). */
-export function validarPergunta(bruto, contentType = 'application/json') {
+export function validarPergunta(bruto, contentType = 'application/json', g = guardrailsPadrao()) {
   const detalhe = (d) => ({ ok: false, detail: [d] });
   if (!bruto.length) return detalhe({ type: 'missing', loc: ['body'], msg: 'Field required', input: null });
   const texto = bruto.toString('utf8');
@@ -680,9 +954,16 @@ export function validarPergunta(bruto, contentType = 'application/json') {
     return detalhe({ type: 'string_too_long', loc, msg: `String should have at most ${MAX_PERGUNTA} characters`,
       input: p, ctx: { max_length: MAX_PERGUNTA } });
   }
-  const limpa = stripPy(p);
+  // normaliza antes de checar: só caracteres invisíveis/espaços = vazia; o limite vale de novo
+  // depois, porque o NFKC pode expandir o texto (como o validador de Pergunta no Python)
+  const limpa = g ? normalizarEntrada(p, g) : stripPy(p);
   if (!limpa) {
     return detalhe({ type: 'value_error', loc, msg: 'Value error, pergunta vazia', input: p, ctx: { error: {} } });
+  }
+  if (tamanho(limpa) > MAX_PERGUNTA) {
+    return detalhe({ type: 'value_error', loc,
+      msg: `Value error, pergunta com mais de ${MAX_PERGUNTA} caracteres após normalização`, input: p,
+      ctx: { error: {} } });
   }
   return { ok: true, pergunta: limpa };
 }
@@ -758,6 +1039,8 @@ export function caminhosPadrao(dir = AQUI) {
     dirEstatico: fs.existsSync(dist) ? dist : path.join(dir, 'public'),
     sistema: fs.existsSync(local) ? local : path.join(dir, '..', 'assistente', 'prompts', 'sistema.md'),
     contexto: path.join(dir, 'contexto.json'),
+    guardrails: fs.existsSync(path.join(dir, 'guardrails.json')) ? path.join(dir, 'guardrails.json')
+      : path.join(dir, '..', 'assistente', 'prompts', 'guardrails.json'),
   };
 }
 
@@ -772,9 +1055,13 @@ export function criarServidor(opcoes = {}) {
   const sistema = 'sistema' in opcoes ? opcoes.sistema
     : lerArquivoOuNulo(padrao.sistema, (c) => fs.readFileSync(c, 'utf8'));
   const contexto = 'contexto' in opcoes ? opcoes.contexto : lerArquivoOuNulo(padrao.contexto, carregarContexto);
+  // sem guardrails o chat não responde (falha fechada); /health e a landing seguem no ar
+  const guardrails = 'guardrails' in opcoes ? opcoes.guardrails
+    : lerArquivoOuNulo(padrao.guardrails, carregarGuardrails);
   const log = opcoes.log || console.log;
   const cliente = criarClienteHTTP(cfg, opcoes.fetch || globalThis.fetch);
-  const assistente = criarAssistente(cfg, cliente, sistema, { dormir: opcoes.dormir, log });
+  const assistente = guardrails
+    ? criarAssistente(cfg, cliente, sistema, { dormir: opcoes.dormir, log, guardrails }) : null;
   const agora = opcoes.agora || Date.now;
   const permitir = criarLimitador(cfg.limite_por_min ?? LIMITE_POR_MINUTO, JANELA_MS, agora);
   const permitirGlobal = criarTetoGlobal(cfg.limite_global_hora ?? LIMITE_GLOBAL_HORA, HORA_MS, agora);
@@ -799,10 +1086,10 @@ export function criarServidor(opcoes = {}) {
     } catch (e) {
       return enviarJson(res, e.status || 400, { detail: 'Corpo da requisição inválido ou grande demais.' });
     }
-    const v = validarPergunta(bruto, req.headers['content-type']);
+    const v = validarPergunta(bruto, req.headers['content-type'], guardrails);
     if (!v.ok) return enviarJson(res, 422, { detail: v.detail });
-    if (!contexto || sistema == null) {
-      log(`pergunta ${JSON.stringify({ status: 'sem_contexto' })}`);
+    if (!contexto || sistema == null || !assistente) {
+      log(`pergunta ${JSON.stringify({ status: assistente ? 'sem_contexto' : 'sem_guardrails' })}`);
       return enviarJson(res, 200, respostaErro());
     }
     const ctx = montarContexto(v.pergunta, contexto);
