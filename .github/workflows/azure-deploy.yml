@@ -25,7 +25,7 @@ jobs:
 
       - name: '3. Testar o Servidor do Chat (node --test)'
         working-directory: web
-        run: node --test test/
+        run: node --test test/*.test.mjs
 
       - name: '4. Preparar Artefato de Produção (Landing UrbanCare + Chat)'
         run: |

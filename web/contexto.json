@@ -1,0 +1,1210 @@
+{
+ "versao": 1,
+ "gerado_em": "2026-11-19T12:17:09-03:00",
+ "tem_dados": true,
+ "manual": {
+  "manual#visao-geral": "Visão geral\nO UrbanCare é um abrigo de ônibus inteligente, pensado para quem espera o ônibus à noite: principalmente mulheres desacompanhadas, mães com crianças e pessoas idosas. Cada abrigo tem sensores e um processador local (Edge AI) que faz três coisas:\n\n1. **Monitora a lotação** do ponto, para que a operação possa despachar um ônibus extra.\n2. **Detecta queda de luminosidade**, para abrir chamado de zeladoria com a concessionária de iluminação.\n3. **Detecta pessoa vulnerável sozinha à noite**, para sugerir patrulhamento preventivo.\n\nO processamento acontece no próprio abrigo. A câmera gera apenas silhuetas anônimas e contagens; **nenhuma imagem é gravada nem enviada** à central. O painel recebe somente números e alertas.\n\nQuem paga a instalação e a operação são as Secretarias de Mobilidade e as concessionárias de iluminação, por meio de Parceria Público-Privada (PPP). A meta do primeiro ano é instalar 150 abrigos, nos pontos mais vulneráveis do ranking.",
+  "manual#telas": "Telas do painel\n**Mapa.** Mostra todos os pontos de ônibus de rua da cidade, coloridos pela faixa de vulnerabilidade (vermelho = alta, amarelo = média, cinza = baixa). Os abrigos já instalados aparecem com contorno azul. Clique em um ponto para abrir a tela Ponto. Use o filtro de distrito no topo para aproximar o mapa.\n\n**Ranking.** Lista os pontos do mais vulnerável (posição 1) para o menos vulnerável. Cada linha mostra o nome do ponto, o distrito, o índice, a faixa, as ocorrências noturnas próximas e a distância até o poste mais próximo. É possível filtrar por distrito, subprefeitura e faixa, e exportar a lista em CSV.\n\n**Alertas.** Fila dos alertas abertos, do mais recente para o mais antigo. Cada alerta tem tipo, ponto, horário de início e estado (novo, em atendimento, resolvido). Para assumir um alerta, clique em \"Atender\"; ao concluir, registre a ação tomada e clique em \"Resolver\". Alertas não atendidos em 15 minutos ficam destacados em laranja.\n\n**Ponto.** Detalhe de um ponto: endereço, distrito, subprefeitura, índice e posição no ranking, gráficos das últimas 24 horas de luminosidade e de lotação, e histórico de alertas. Se o ponto ainda não tem abrigo instalado, a tela mostra só os indicadores do ranking.\n\n**Relatórios.** Resumos por distrito e por subprefeitura (quantidade de pontos, índice médio, pontos na faixa alta, ocorrências noturnas) e a data da última atualização dos dados.",
+  "manual#alertas": "Alertas: o que significam e o que fazer\n**Lotação alta.** A contagem anônima de pessoas no abrigo passou do limite configurado para aquele ponto (padrão: 25 pessoas) por mais de 10 minutos. O que fazer: verificar no sistema da operação se há ônibus atrasado na linha e, se for o caso, solicitar despacho de ônibus extra. Lotação alta é comum nos picos da manhã (por volta das 7h) e do fim da tarde (por volta das 18h).\n\n**Escuridão.** A luminosidade medida no abrigo ficou abaixo de 10 lux à noite, o que indica lâmpada queimada, poste apagado ou falha de energia. O que fazer: abrir chamado de zeladoria com a concessionária de iluminação, informando o ponto e o horário \"escuro desde\". Se o ponto também está na faixa alta de vulnerabilidade, marque o chamado como prioritário. A tela \"pontos escuros agora\" lista todos os abrigos nessa situação.\n\n**Pessoa sozinha à noite.** Entre 21h e 5h, o abrigo detectou uma única pessoa esperando por um período prolongado. O alerta não identifica a pessoa, não guarda imagem e não diz nada sobre gênero, idade ou aparência. O que fazer: o alerta é uma **sugestão** de patrulhamento preventivo. A decisão de acionar a Guarda Civil Metropolitana ou outra equipe é sempre de um operador humano, que deve considerar o contexto (por exemplo, horário do próximo ônibus e outros alertas na região). Nunca trate o alerta como suspeita sobre a pessoa: ela é quem está sendo protegida.\n\n**Sensor sem comunicação.** O abrigo não envia leituras há mais de 30 minutos. O que fazer: abrir chamado de manutenção do equipamento. Enquanto isso, os outros alertas desse abrigo não funcionam.",
+  "manual#indice": "Índice de vulnerabilidade noturna\nO índice ordena os pontos de ônibus de rua pela necessidade de um abrigo inteligente. Ele vai de 0 a 1 e combina duas partes:\n\n- **Ocorrências noturnas (peso 0,6):** quantidade de boletins de ocorrência registrados à noite e de madrugada a até 150 metros do ponto, em escala logarítmica (`log(1 + ocorrências) / log(1 + maior valor da cidade)`). A escala logarítmica diferencia bem os pontos com muitas ocorrências e reduz o peso de valores extremos.\n- **Escuridão (peso 0,4):** distância até o poste de iluminação pública mais próximo, convertida em percentil entre todos os pontos (quanto mais longe o poste, maior a escuridão).\n\nSó entram no índice boletins de 2025, registrados em via pública, sem crimes contra patrimônio que não atingem quem espera o ônibus (furto de fios e cabos, de veículo, de dentro de veículo e de carga). Cada coordenada exata conta no máximo 10 boletins, para que eventos (shows, festivais) e endereços imprecisos não dominem o ranking.\n\n**Faixas.** As faixas são definidas pela posição no ranking: **alta** = os 10% de pontos mais vulneráveis da cidade; **média** = os 30% seguintes; **baixa** = os 60% restantes. Dizer que um ponto está na faixa alta significa que ele está entre os 10% mais vulneráveis, não que ele seja \"perigoso\" em termos absolutos.\n\n**Pontos fora do índice.** Paradas dentro de terminais e de corredores ou estações de transferência não entram no ranking: elas têm iluminação própria e estrutura diferente da de um abrigo de rua.\n\n**Como ler o índice com responsabilidade.** O índice indica onde um abrigo inteligente tende a ajudar mais. Ele não mede o caráter de um bairro nem das pessoas que moram ou circulam nele. Boletins de ocorrência refletem também onde as pessoas mais registram ocorrências (mais movimento, mais delegacias, mais confiança na polícia), então regiões com pouca notificação podem estar subestimadas.",
+  "manual#dados": "Dados e atualização\nOs dados do painel são atualizados uma vez por dia, de madrugada, por um pipeline automático (Apache Airflow). As fontes são:\n\n- **Pontos de ônibus e postes de iluminação:** GeoSampa, portal de dados geográficos da Prefeitura de São Paulo.\n- **Distritos e subprefeituras:** GeoSampa.\n- **Boletins de ocorrência:** Secretaria da Segurança Pública do Estado de São Paulo (SSP-SP), dados abertos de 2025.\n- **Leituras dos abrigos (luminosidade, lotação, pessoa sozinha):** nesta versão de demonstração, são **simuladas** para os 150 primeiros pontos do ranking, com sete dias de histórico. Todo registro simulado vem marcado como tal.\n\nA data da última atualização aparece na tela Relatórios. Se ela tiver mais de dois dias, avise a equipe técnica: o pipeline pode ter falhado.\n\nLimitações conhecidas: a SSP-SP não informa a hora exata das ocorrências, apenas o período (noite ou madrugada); a localização de parte dos boletins é aproximada; o cadastro de postes pode não incluir iluminação particular ou de equipamentos públicos.",
+  "manual#problemas": "Problemas comuns e o que fazer\n- **Ponto aparece escuro, mas a equipe em campo diz que está iluminado.** Pode ser sujeira ou obstrução no sensor de luz. Abra chamado de manutenção do abrigo, não de iluminação.\n- **Ponto sem gráfico de luminosidade ou lotação.** O ponto ainda não tem abrigo instalado (só os 150 primeiros do ranking têm), ou o sensor está sem comunicação.\n- **Ranking mudou de um dia para o outro.** Normal: o índice é recalculado a cada atualização. Mudanças grandes costumam vir de nova carga de dados da SSP-SP ou do cadastro de postes.\n- **Distrito não aparece no filtro.** Confira a grafia oficial (por exemplo, \"Sé\", \"Saúde\", \"Cidade Dutra\"). O painel usa os 96 distritos oficiais do município.\n- **Muitos alertas de lotação ao mesmo tempo.** Verifique se há interrupção de linha ou de metrô na região; a operação pode precisar de plano de contingência.\n- **O assistente não sabe responder.** Ele só usa este manual e o resumo de dados do dia. Para dúvidas fora disso, procure a coordenação da central.",
+  "manual#privacidade": "Privacidade e LGPD\n- O abrigo **não grava imagens** e não envia vídeo. O processamento é local e gera apenas contagens e alertas.\n- O sistema **não identifica pessoas**: não há reconhecimento facial, nem coleta de nome, documento, telefone ou placa.\n- Os dados de ocorrências usados no índice são agregados por ponto; número do boletim, delegacia e endereço da vítima são descartados no tratamento.\n- Operadores não devem registrar dados pessoais nas anotações dos alertas (por exemplo, descrição física de alguém). Registre apenas a ação tomada.\n- Pedidos de titulares de dados e dúvidas sobre tratamento de dados devem ser encaminhados ao encarregado (DPO) da Secretaria responsável."
+ },
+ "blocos_globais": [
+  [
+   "gold.execucao",
+   "Última atualização dos dados: 18/11/2026 17:21 (status ok)"
+  ],
+  [
+   "gold.ft_indicador_ponto",
+   "Top 10 do ranking de vulnerabilidade (cidade toda):\n- ponto_id 630012901 | R. MOURATO COELHO , 1022 | distrito PINHEIROS | posição 1 | índice 0.910 | faixa alta | ocorrências noturnas a 150 m: 183 | poste mais próximo: 18 m\n- ponto_id 2600262 | R. AUGUSTA , 810 | distrito CONSOLACAO | posição 2 | índice 0.910 | faixa alta | ocorrências noturnas a 150 m: 194 | poste mais próximo: 18 m\n- ponto_id 440016921 | AV. PAULISTA , 2027 | distrito JARDIM PAULISTA | posição 3 | índice 0.898 | faixa alta | ocorrências noturnas a 150 m: 120 | poste mais próximo: 25 m\n- ponto_id 630014818 | AV. BRIG. FARIA LIMA , 447 | distrito PINHEIROS | posição 4 | índice 0.883 | faixa alta | ocorrências noturnas a 150 m: 136 | poste mais próximo: 19 m\n- ponto_id 260016919 | AV. PAULISTA , 2026 | distrito CONSOLACAO | posição 5 | índice 0.882 | faixa alta | ocorrências noturnas a 150 m: 113 | poste mais próximo: 21 m\n- ponto_id 630012910 | R. FRADIQUE COUTINHO , 689 | distrito PINHEIROS | posição 6 | índice 0.865 | faixa alta | ocorrências noturnas a 150 m: 99 | poste mais próximo: 20 m\n- ponto_id 260016682 | R. AUGUSTA , 753 | distrito CONSOLACAO | posição 7 | índice 0.858 | faixa alta | ocorrências noturnas a 150 m: 184 | poste mais próximo: 15 m\n- ponto_id 6311404 | R. FERREIRA DE ARAÚJO , 221 | distrito PINHEIROS | posição 8 | índice 0.855 | faixa alta | ocorrências noturnas a 150 m: 96 | poste mais próximo: 20 m\n- ponto_id 610016826 | R. PALESTRA ITÁLIA , 1708 | distrito BARRA FUNDA | posição 9 | índice 0.852 | faixa alta | ocorrências noturnas a 150 m: 161 | poste mais próximo: 15 m\n- ponto_id 630014827 | AV. PEDROSO DE MORAES , 1619 | distrito PINHEIROS | posição 10 | índice 0.849 | faixa alta | ocorrências noturnas a 150 m: 96 | poste mais próximo: 19 m"
+  ],
+  [
+   "gold.vw_pontos_escuros_agora",
+   "Pontos com abrigo escuros agora (lux < 10 na última leitura; leituras SIMULADAS):\n- ponto_id 3702832 | METRÔ CONCEIÇÃO , 0 | distrito JABAQUARA | escuro desde 17/11/2026 18:00 | lux atual 3.1\n- ponto_id 6311404 | R. FERREIRA DE ARAÚJO , 221 | distrito PINHEIROS | escuro desde 17/11/2026 18:00 | lux atual 2.7\n- ponto_id 7000007 | AL. EDUARDO PRADO , 854 | distrito SANTA CECILIA | escuro desde 17/11/2026 18:00 | lux atual 1.9\n- ponto_id 70016916 | AV. PAULISTA , 1374 | distrito BELA VISTA | escuro desde 17/11/2026 18:00 | lux atual 2.3"
+  ],
+  [
+   "gold.ft_resumo_distrito",
+   "Os 5 distritos com maior índice médio:\n- REPUBLICA (subprefeitura SE): 122 pontos, índice médio 0.566, 83 na faixa alta, 1833 ocorrências noturnas\n- BELA VISTA (subprefeitura SE): 53 pontos, índice médio 0.558, 33 na faixa alta, 1248 ocorrências noturnas\n- CONSOLACAO (subprefeitura SE): 73 pontos, índice médio 0.549, 46 na faixa alta, 1767 ocorrências noturnas\n- SE (subprefeitura SE): 85 pontos, índice médio 0.544, 50 na faixa alta, 780 ocorrências noturnas\n- BARRA FUNDA (subprefeitura LAPA): 109 pontos, índice médio 0.527, 69 na faixa alta, 959 ocorrências noturnas"
+  ]
+ ],
+ "pontos_globais": [
+  "260016682",
+  "260016919",
+  "2600262",
+  "3702832",
+  "440016921",
+  "610016826",
+  "630012901",
+  "630012910",
+  "630014818",
+  "630014827",
+  "6311404",
+  "7000007",
+  "70016916"
+ ],
+ "distritos": [
+  "REPUBLICA",
+  "BELA VISTA",
+  "CONSOLACAO",
+  "SE",
+  "BARRA FUNDA",
+  "PINHEIROS",
+  "BRAS",
+  "SANTA CECILIA",
+  "PARI",
+  "BOM RETIRO",
+  "JARDIM PAULISTA",
+  "ITAIM BIBI",
+  "SANTANA",
+  "LIBERDADE",
+  "TATUAPE",
+  "LAPA",
+  "SANTO AMARO",
+  "PERDIZES",
+  "BUTANTA",
+  "BELEM",
+  "VILA MARIANA",
+  "VILA GUILHERME",
+  "MOEMA",
+  "CAMBUCI",
+  "LIMAO",
+  "MORUMBI",
+  "SAO MIGUEL",
+  "CAMPO LIMPO",
+  "PENHA",
+  "VILA MARIA",
+  "CAPAO REDONDO",
+  "MOOCA",
+  "CIDADE ADEMAR",
+  "CAMPO GRANDE",
+  "VILA ANDRADE",
+  "VILA JACUI",
+  "SAUDE",
+  "CACHOEIRINHA",
+  "SOCORRO",
+  "FREGUESIA DO O",
+  "VILA LEOPOLDINA",
+  "ITAIM PAULISTA",
+  "ITAQUERA",
+  "CIDADE TIRADENTES",
+  "ARTUR ALVIM",
+  "IPIRANGA",
+  "JABAQUARA",
+  "CASA VERDE",
+  "CIDADE DUTRA",
+  "ERMELINO MATARAZZO",
+  "JARDIM SAO LUIS",
+  "SACOMA",
+  "GUAIANASES",
+  "JAGUARE",
+  "SAO MATEUS",
+  "BRASILANDIA",
+  "CAMPO BELO",
+  "PIRITUBA",
+  "TUCURUVI",
+  "VILA SONIA",
+  "VILA MEDEIROS",
+  "CURSINO",
+  "VILA CURUCA",
+  "LAJEADO",
+  "JAGUARA",
+  "AGUA RASA",
+  "CARRAO",
+  "RIO PEQUENO",
+  "RAPOSO TAVARES",
+  "ALTO DE PINHEIROS",
+  "MANDAQUI",
+  "JOSE BONIFACIO",
+  "JACANA",
+  "PEDREIRA",
+  "VILA FORMOSA",
+  "SAPOPEMBA",
+  "JARDIM HELENA",
+  "SAO LUCAS",
+  "VILA MATILDE",
+  "SAO RAFAEL",
+  "VILA PRUDENTE",
+  "ARICANDUVA",
+  "JARDIM ANGELA",
+  "JARAGUA",
+  "CIDADE LIDER",
+  "CANGAIBA",
+  "ANHANGUERA",
+  "SAO DOMINGOS",
+  "TREMEMBE",
+  "PONTE RASA",
+  "GRAJAU",
+  "PARQUE DO CARMO",
+  "IGUATEMI",
+  "PERUS",
+  "PARELHEIROS",
+  "MARSILAC"
+ ],
+ "por_distrito": {
+  "REPUBLICA": {
+   "fonte": "gold.ft_resumo_distrito#REPUBLICA",
+   "bloco": "Distrito REPUBLICA (subprefeitura SE): 122 pontos, índice médio 0.566, 83 na faixa alta, 1833 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 6714583 | R. CONS. CRISPINIANO , 403 | distrito REPUBLICA | posição 19 | índice 0.823 | faixa alta | ocorrências noturnas a 150 m: 96 | poste mais próximo: 17 m\n- ponto_id 670012738 | R. REGO FREITAS , 52 | distrito REPUBLICA | posição 27 | índice 0.807 | faixa alta | ocorrências noturnas a 150 m: 123 | poste mais próximo: 14 m\n- ponto_id 670012737 | AV. DR. VIEIRA DE CARVALHO , 35 | distrito REPUBLICA | posição 31 | índice 0.801 | faixa alta | ocorrências noturnas a 150 m: 165 | poste mais próximo: 13 m\n- ponto_id 670015690 | AV. IPIRANGA , 102 | distrito REPUBLICA | posição 34 | índice 0.796 | faixa alta | ocorrências noturnas a 150 m: 96 | poste mais próximo: 15 m\n- ponto_id 6714559 | R. MARTINS FONTES , 280 | distrito REPUBLICA | posição 40 | índice 0.788 | faixa alta | ocorrências noturnas a 150 m: 41 | poste mais próximo: 26 m",
+   "pontos": [
+    "670012737",
+    "670012738",
+    "670015690",
+    "6714559",
+    "6714583"
+   ]
+  },
+  "BELA VISTA": {
+   "fonte": "gold.ft_resumo_distrito#BELA VISTA",
+   "bloco": "Distrito BELA VISTA (subprefeitura SE): 53 pontos, índice médio 0.558, 33 na faixa alta, 1248 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 70015949 | AV. PAULISTA , 1754 | distrito BELA VISTA | posição 14 | índice 0.839 | faixa alta | ocorrências noturnas a 150 m: 65 | poste mais próximo: 42 m\n- ponto_id 70016933 | R. JOÃO PASSALACQUA , 0 | distrito BELA VISTA | posição 18 | índice 0.824 | faixa alta | ocorrências noturnas a 150 m: 155 | poste mais próximo: 14 m\n- ponto_id 440016923 | AV. PAULISTA , 901 | distrito BELA VISTA | posição 20 | índice 0.822 | faixa alta | ocorrências noturnas a 150 m: 55 | poste mais próximo: 39 m\n- ponto_id 706363 | R. CARLOS COMENALE , 32 | distrito BELA VISTA | posição 23 | índice 0.818 | faixa alta | ocorrências noturnas a 150 m: 58 | poste mais próximo: 22 m\n- ponto_id 70016932 | R. RUI BARBOSA , 47 | distrito BELA VISTA | posição 42 | índice 0.786 | faixa alta | ocorrências noturnas a 150 m: 72 | poste mais próximo: 16 m",
+   "pontos": [
+    "440016923",
+    "70015949",
+    "70016932",
+    "70016933",
+    "706363"
+   ]
+  },
+  "CONSOLACAO": {
+   "fonte": "gold.ft_resumo_distrito#CONSOLACAO",
+   "bloco": "Distrito CONSOLACAO (subprefeitura SE): 73 pontos, índice médio 0.549, 46 na faixa alta, 1767 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 2600262 | R. AUGUSTA , 810 | distrito CONSOLACAO | posição 2 | índice 0.910 | faixa alta | ocorrências noturnas a 150 m: 194 | poste mais próximo: 18 m\n- ponto_id 260016919 | AV. PAULISTA , 2026 | distrito CONSOLACAO | posição 5 | índice 0.882 | faixa alta | ocorrências noturnas a 150 m: 113 | poste mais próximo: 21 m\n- ponto_id 260016682 | R. AUGUSTA , 753 | distrito CONSOLACAO | posição 7 | índice 0.858 | faixa alta | ocorrências noturnas a 150 m: 184 | poste mais próximo: 15 m\n- ponto_id 2600704 | R. MATIAS AIRES , 426 | distrito CONSOLACAO | posição 24 | índice 0.817 | faixa alta | ocorrências noturnas a 150 m: 66 | poste mais próximo: 20 m\n- ponto_id 260016680 | R. AUGUSTA , 1149 | distrito CONSOLACAO | posição 26 | índice 0.808 | faixa alta | ocorrências noturnas a 150 m: 228 | poste mais próximo: 12 m",
+   "pontos": [
+    "260016680",
+    "260016682",
+    "260016919",
+    "2600262",
+    "2600704"
+   ]
+  },
+  "SE": {
+   "fonte": "gold.ft_resumo_distrito#SE",
+   "bloco": "Distrito SE (subprefeitura SE): 85 pontos, índice médio 0.544, 50 na faixa alta, 780 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 800015291 | PQ. D. PEDRO II , 0 | distrito SE | posição 29 | índice 0.805 | faixa alta | ocorrências noturnas a 150 m: 47 | poste mais próximo: 42 m\n- ponto_id 800015932 | AV. DO ESTADO , 0 | distrito SE | posição 33 | índice 0.797 | faixa alta | ocorrências noturnas a 150 m: 54 | poste mais próximo: 20 m\n- ponto_id 800016574 | AV. DA LIBERDADE , 170 | distrito SE | posição 50 | índice 0.778 | faixa alta | ocorrências noturnas a 150 m: 42 | poste mais próximo: 21 m\n- ponto_id 800016572 | AV. DA LIBERDADE , 47 | distrito SE | posição 53 | índice 0.776 | faixa alta | ocorrências noturnas a 150 m: 42 | poste mais próximo: 21 m\n- ponto_id 8010160 | R. DR. RODRIGO SILVA , 26 | distrito SE | posição 71 | índice 0.764 | faixa alta | ocorrências noturnas a 150 m: 44 | poste mais próximo: 18 m",
+   "pontos": [
+    "800015291",
+    "800015932",
+    "800016572",
+    "800016574",
+    "8010160"
+   ]
+  },
+  "BARRA FUNDA": {
+   "fonte": "gold.ft_resumo_distrito#BARRA FUNDA",
+   "bloco": "Distrito BARRA FUNDA (subprefeitura LAPA): 109 pontos, índice médio 0.527, 69 na faixa alta, 959 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 610016826 | R. PALESTRA ITÁLIA , 1708 | distrito BARRA FUNDA | posição 9 | índice 0.852 | faixa alta | ocorrências noturnas a 150 m: 161 | poste mais próximo: 15 m\n- ponto_id 614547 | AV. ANTÁRTICA , 608 | distrito BARRA FUNDA | posição 62 | índice 0.769 | faixa alta | ocorrências noturnas a 150 m: 34 | poste mais próximo: 27 m\n- ponto_id 60016894 | R. CARDOSO DE ALMEIDA , 184 | distrito BARRA FUNDA | posição 73 | índice 0.764 | faixa alta | ocorrências noturnas a 150 m: 49 | poste mais próximo: 17 m\n- ponto_id 610016827 | R. PALESTRA ITÁLIA , 2100 | distrito BARRA FUNDA | posição 88 | índice 0.750 | faixa alta | ocorrências noturnas a 150 m: 40 | poste mais próximo: 18 m\n- ponto_id 60015948 | AV. DR. ADOLPHO PINTO , 37 | distrito BARRA FUNDA | posição 89 | índice 0.750 | faixa alta | ocorrências noturnas a 150 m: 34 | poste mais próximo: 20 m",
+   "pontos": [
+    "60015948",
+    "60016894",
+    "610016826",
+    "610016827",
+    "614547"
+   ]
+  },
+  "PINHEIROS": {
+   "fonte": "gold.ft_resumo_distrito#PINHEIROS",
+   "bloco": "Distrito PINHEIROS (subprefeitura PINHEIROS): 149 pontos, índice médio 0.471, 62 na faixa alta, 2507 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 630012901 | R. MOURATO COELHO , 1022 | distrito PINHEIROS | posição 1 | índice 0.910 | faixa alta | ocorrências noturnas a 150 m: 183 | poste mais próximo: 18 m\n- ponto_id 630014818 | AV. BRIG. FARIA LIMA , 447 | distrito PINHEIROS | posição 4 | índice 0.883 | faixa alta | ocorrências noturnas a 150 m: 136 | poste mais próximo: 19 m\n- ponto_id 630012910 | R. FRADIQUE COUTINHO , 689 | distrito PINHEIROS | posição 6 | índice 0.865 | faixa alta | ocorrências noturnas a 150 m: 99 | poste mais próximo: 20 m\n- ponto_id 6311404 | R. FERREIRA DE ARAÚJO , 221 | distrito PINHEIROS | posição 8 | índice 0.855 | faixa alta | ocorrências noturnas a 150 m: 96 | poste mais próximo: 20 m\n- ponto_id 630014827 | AV. PEDROSO DE MORAES , 1619 | distrito PINHEIROS | posição 10 | índice 0.849 | faixa alta | ocorrências noturnas a 150 m: 96 | poste mais próximo: 19 m",
+   "pontos": [
+    "630012901",
+    "630012910",
+    "630014818",
+    "630014827",
+    "6311404"
+   ]
+  },
+  "BRAS": {
+   "fonte": "gold.ft_resumo_distrito#BRAS",
+   "bloco": "Distrito BRAS (subprefeitura MOOCA): 76 pontos, índice médio 0.459, 27 na faixa alta, 567 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 1010108 | R. VASCO DA GAMA , 58 | distrito BRAS | posição 120 | índice 0.733 | faixa alta | ocorrências noturnas a 150 m: 28 | poste mais próximo: 20 m\n- ponto_id 100014334 | R. ORIENTE , 156 | distrito BRAS | posição 182 | índice 0.703 | faixa alta | ocorrências noturnas a 150 m: 40 | poste mais próximo: 15 m\n- ponto_id 100014329 | AV. CELSO GARCIA , 109 | distrito BRAS | posição 218 | índice 0.687 | faixa alta | ocorrências noturnas a 150 m: 34 | poste mais próximo: 15 m\n- ponto_id 800015931 | R. DA FIGUEIRA , 21 | distrito BRAS | posição 266 | índice 0.669 | faixa alta | ocorrências noturnas a 150 m: 16 | poste mais próximo: 19 m\n- ponto_id 100014351 | R. BR. DE LADÁRIO , 195 | distrito BRAS | posição 295 | índice 0.661 | faixa alta | ocorrências noturnas a 150 m: 12 | poste mais próximo: 24 m",
+   "pontos": [
+    "100014329",
+    "100014334",
+    "100014351",
+    "1010108",
+    "800015931"
+   ]
+  },
+  "SANTA CECILIA": {
+   "fonte": "gold.ft_resumo_distrito#SANTA CECILIA",
+   "bloco": "Distrito SANTA CECILIA (subprefeitura SE): 95 pontos, índice médio 0.446, 32 na faixa alta, 964 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 7000005 | AV. ANGÉLICA , 160 | distrito SANTA CECILIA | posição 12 | índice 0.845 | faixa alta | ocorrências noturnas a 150 m: 82 | poste mais próximo: 20 m\n- ponto_id 700016628 | R. MÁRIO DE ANDRADE , 190 | distrito SANTA CECILIA | posição 22 | índice 0.818 | faixa alta | ocorrências noturnas a 150 m: 60 | poste mais próximo: 22 m\n- ponto_id 700016626 | R. MÁRIO DE ANDRADE , 61 | distrito SANTA CECILIA | posição 38 | índice 0.789 | faixa alta | ocorrências noturnas a 150 m: 62 | poste mais próximo: 18 m\n- ponto_id 700016129 | R. CANUTO DO VAL , 54 | distrito SANTA CECILIA | posição 66 | índice 0.766 | faixa alta | ocorrências noturnas a 150 m: 32 | poste mais próximo: 47 m\n- ponto_id 700013965 | R. BRIG. GALVÃO , 554 | distrito SANTA CECILIA | posição 77 | índice 0.759 | faixa alta | ocorrências noturnas a 150 m: 36 | poste mais próximo: 20 m",
+   "pontos": [
+    "7000005",
+    "700013965",
+    "700016129",
+    "700016626",
+    "700016628"
+   ]
+  },
+  "PARI": {
+   "fonte": "gold.ft_resumo_distrito#PARI",
+   "bloco": "Distrito PARI (subprefeitura MOOCA): 57 pontos, índice médio 0.426, 17 na faixa alta, 305 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 1009854 | R. JOÃO TEODORO , 1075 | distrito PARI | posição 134 | índice 0.724 | faixa alta | ocorrências noturnas a 150 m: 27 | poste mais próximo: 20 m\n- ponto_id 570014317 | R. BR. DE LADÁRIO , 783 | distrito PARI | posição 211 | índice 0.692 | faixa alta | ocorrências noturnas a 150 m: 20 | poste mais próximo: 19 m\n- ponto_id 570014316 | R. BR. DE LADÁRIO , 961 | distrito PARI | posição 213 | índice 0.691 | faixa alta | ocorrências noturnas a 150 m: 19 | poste mais próximo: 20 m\n- ponto_id 570014339 | AV. VAUTIER , 417 | distrito PARI | posição 219 | índice 0.685 | faixa alta | ocorrências noturnas a 150 m: 31 | poste mais próximo: 16 m\n- ponto_id 570014343 | R. HANNEMANN , 176 | distrito PARI | posição 302 | índice 0.659 | faixa alta | ocorrências noturnas a 150 m: 35 | poste mais próximo: 14 m",
+   "pontos": [
+    "1009854",
+    "570014316",
+    "570014317",
+    "570014339",
+    "570014343"
+   ]
+  },
+  "BOM RETIRO": {
+   "fonte": "gold.ft_resumo_distrito#BOM RETIRO",
+   "bloco": "Distrito BOM RETIRO (subprefeitura SE): 75 pontos, índice médio 0.420, 22 na faixa alta, 556 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 90015086 | AV. SANTOS DUMONT , 87 | distrito BOM RETIRO | posição 39 | índice 0.789 | faixa alta | ocorrências noturnas a 150 m: 41 | poste mais próximo: 28 m\n- ponto_id 90013906 | AV. SANTOS DUMONT , 555 | distrito BOM RETIRO | posição 58 | índice 0.774 | faixa alta | ocorrências noturnas a 150 m: 35 | poste mais próximo: 31 m\n- ponto_id 90017115 | AV. SANTOS DUMONT , 56 | distrito BOM RETIRO | posição 61 | índice 0.770 | faixa alta | ocorrências noturnas a 150 m: 60 | poste mais próximo: 16 m\n- ponto_id 90017114 | AV. TIRADENTES , 614 | distrito BOM RETIRO | posição 64 | índice 0.766 | faixa alta | ocorrências noturnas a 150 m: 46 | poste mais próximo: 18 m\n- ponto_id 90011797 | AV. TIRADENTES , 615 | distrito BOM RETIRO | posição 177 | índice 0.706 | faixa alta | ocorrências noturnas a 150 m: 55 | poste mais próximo: 14 m",
+   "pontos": [
+    "90011797",
+    "90013906",
+    "90015086",
+    "90017114",
+    "90017115"
+   ]
+  },
+  "JARDIM PAULISTA": {
+   "fonte": "gold.ft_resumo_distrito#JARDIM PAULISTA",
+   "bloco": "Distrito JARDIM PAULISTA (subprefeitura PINHEIROS): 82 pontos, índice médio 0.402, 25 na faixa alta, 603 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 440016921 | AV. PAULISTA , 2027 | distrito JARDIM PAULISTA | posição 3 | índice 0.898 | faixa alta | ocorrências noturnas a 150 m: 120 | poste mais próximo: 25 m\n- ponto_id 440015042 | AL. SANTOS , 2219 | distrito JARDIM PAULISTA | posição 59 | índice 0.773 | faixa alta | ocorrências noturnas a 150 m: 84 | poste mais próximo: 15 m\n- ponto_id 4406632 | R. PEIXOTO GOMIDE , 894 | distrito JARDIM PAULISTA | posição 74 | índice 0.763 | faixa alta | ocorrências noturnas a 150 m: 71 | poste mais próximo: 15 m\n- ponto_id 440015043 | R. AUGUSTA , 1771 | distrito JARDIM PAULISTA | posição 153 | índice 0.716 | faixa alta | ocorrências noturnas a 150 m: 145 | poste mais próximo: 10 m\n- ponto_id 440015041 | R. BELA CINTRA , 1165 | distrito JARDIM PAULISTA | posição 263 | índice 0.669 | faixa alta | ocorrências noturnas a 150 m: 50 | poste mais próximo: 13 m",
+   "pontos": [
+    "440015041",
+    "440015042",
+    "440015043",
+    "440016921",
+    "4406632"
+   ]
+  },
+  "ITAIM BIBI": {
+   "fonte": "gold.ft_resumo_distrito#ITAIM BIBI",
+   "bloco": "Distrito ITAIM BIBI (subprefeitura PINHEIROS): 234 pontos, índice médio 0.396, 69 na faixa alta, 977 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 3407184 | AC. AREA DE APOIO BANDEIRANTES , 0 | distrito ITAIM BIBI | posição 102 | índice 0.741 | faixa alta | ocorrências noturnas a 150 m: 35 | poste mais próximo: 18 m\n- ponto_id 340015024 | AV. BRIG. FARIA LIMA , 3730 | distrito ITAIM BIBI | posição 110 | índice 0.736 | faixa alta | ocorrências noturnas a 150 m: 28 | poste mais próximo: 21 m\n- ponto_id 340015461 | R. JOAQUIM FLORIANO , 922 | distrito ITAIM BIBI | posição 126 | índice 0.728 | faixa alta | ocorrências noturnas a 150 m: 28 | poste mais próximo: 20 m\n- ponto_id 3407182 | AC. AREA DE APOIO BANDEIRANTES , 0 | distrito ITAIM BIBI | posição 147 | índice 0.719 | faixa alta | ocorrências noturnas a 150 m: 37 | poste mais próximo: 16 m\n- ponto_id 3407099 | AV. JORN. ROBERTO MARINHO , 0 | distrito ITAIM BIBI | posição 168 | índice 0.710 | faixa alta | ocorrências noturnas a 150 m: 20 | poste mais próximo: 23 m",
+   "pontos": [
+    "340015024",
+    "340015461",
+    "3407099",
+    "3407182",
+    "3407184"
+   ]
+  },
+  "SANTANA": {
+   "fonte": "gold.ft_resumo_distrito#SANTANA",
+   "bloco": "Distrito SANTANA (subprefeitura SANTANA-TUCURUVI): 284 pontos, índice médio 0.386, 73 na faixa alta, 783 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 710000640 | R. DR. GABRIEL PIZA , 223 | distrito SANTANA | posição 15 | índice 0.838 | faixa alta | ocorrências noturnas a 150 m: 88 | poste mais próximo: 19 m\n- ponto_id 7113177 | R. LEITE DE MORAIS , 306 | distrito SANTANA | posição 45 | índice 0.782 | faixa alta | ocorrências noturnas a 150 m: 65 | poste mais próximo: 17 m\n- ponto_id 710000606 | R. EZEQUIEL FREIRE , 302 | distrito SANTANA | posição 48 | índice 0.780 | faixa alta | ocorrências noturnas a 150 m: 50 | poste mais próximo: 19 m\n- ponto_id 710000963 | R. MAL. ODYLIO DENNYS , 141 | distrito SANTANA | posição 84 | índice 0.753 | faixa alta | ocorrências noturnas a 150 m: 49 | poste mais próximo: 17 m\n- ponto_id 7113196 | AV. CRUZEIRO DO SUL , 3301 | distrito SANTANA | posição 97 | índice 0.743 | faixa alta | ocorrências noturnas a 150 m: 85 | poste mais próximo: 14 m",
+   "pontos": [
+    "710000606",
+    "710000640",
+    "710000963",
+    "7113177",
+    "7113196"
+   ]
+  },
+  "LIBERDADE": {
+   "fonte": "gold.ft_resumo_distrito#LIBERDADE",
+   "bloco": "Distrito LIBERDADE (subprefeitura SE): 101 pontos, índice médio 0.385, 29 na faixa alta, 343 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 490016444 | R. TEIXEIRA LEITE , 174 | distrito LIBERDADE | posição 137 | índice 0.723 | faixa alta | ocorrências noturnas a 150 m: 39 | poste mais próximo: 16 m\n- ponto_id 490001936 | R. TAMANDARÉ , 103 | distrito LIBERDADE | posição 242 | índice 0.676 | faixa alta | ocorrências noturnas a 150 m: 17 | poste mais próximo: 19 m\n- ponto_id 1410087 | PÇA. NINA RODRIGUES , 0 | distrito LIBERDADE | posição 420 | índice 0.633 | faixa alta | ocorrências noturnas a 150 m: 13 | poste mais próximo: 18 m\n- ponto_id 490008377 | R. CONS. FURTADO , 534 | distrito LIBERDADE | posição 453 | índice 0.626 | faixa alta | ocorrências noturnas a 150 m: 17 | poste mais próximo: 16 m\n- ponto_id 490017006 | R. TTE. OTÁVIO GOMES , 343 | distrito LIBERDADE | posição 474 | índice 0.623 | faixa alta | ocorrências noturnas a 150 m: 11 | poste mais próximo: 18 m",
+   "pontos": [
+    "1410087",
+    "490001936",
+    "490008377",
+    "490016444",
+    "490017006"
+   ]
+  },
+  "TATUAPE": {
+   "fonte": "gold.ft_resumo_distrito#TATUAPE",
+   "bloco": "Distrito TATUAPE (subprefeitura MOOCA): 160 pontos, índice médio 0.379, 34 na faixa alta, 453 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 8210283 | R. DOMINGOS AGOSTIM , 120 | distrito TATUAPE | posição 43 | índice 0.785 | faixa alta | ocorrências noturnas a 150 m: 59 | poste mais próximo: 18 m\n- ponto_id 8209782 | R. MELO FREIRE , 0 | distrito TATUAPE | posição 56 | índice 0.775 | faixa alta | ocorrências noturnas a 150 m: 39 | poste mais próximo: 22 m\n- ponto_id 820005546 | R. MELO FREIRE , 0 | distrito TATUAPE | posição 165 | índice 0.712 | faixa alta | ocorrências noturnas a 150 m: 53 | poste mais próximo: 14 m\n- ponto_id 820005698 | R. CATIGUÁ , 0 | distrito TATUAPE | posição 236 | índice 0.679 | faixa alta | ocorrências noturnas a 150 m: 19 | poste mais próximo: 18 m\n- ponto_id 8210289 | R. MELO FREIRE , 0 | distrito TATUAPE | posição 384 | índice 0.639 | faixa alta | ocorrências noturnas a 150 m: 45 | poste mais próximo: 12 m",
+   "pontos": [
+    "820005546",
+    "820005698",
+    "8209782",
+    "8210283",
+    "8210289"
+   ]
+  },
+  "LAPA": {
+   "fonte": "gold.ft_resumo_distrito#LAPA",
+   "bloco": "Distrito LAPA (subprefeitura LAPA): 274 pontos, índice médio 0.378, 69 na faixa alta, 467 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 480012869 | R. HERBART , 212 | distrito LAPA | posição 81 | índice 0.757 | faixa alta | ocorrências noturnas a 150 m: 34 | poste mais próximo: 21 m\n- ponto_id 480012868 | R. HERBART , 0 | distrito LAPA | posição 191 | índice 0.699 | faixa alta | ocorrências noturnas a 150 m: 40 | poste mais próximo: 15 m\n- ponto_id 480012834 | R. DRONSFIELD , 134 | distrito LAPA | posição 215 | índice 0.690 | faixa alta | ocorrências noturnas a 150 m: 17 | poste mais próximo: 22 m\n- ponto_id 480012864 | R. CONRADO MORESCHI , 101 | distrito LAPA | posição 241 | índice 0.676 | faixa alta | ocorrências noturnas a 150 m: 24 | poste mais próximo: 16 m\n- ponto_id 480014610 | R. GUAICURUS , 1100 | distrito LAPA | posição 253 | índice 0.672 | faixa alta | ocorrências noturnas a 150 m: 14 | poste mais próximo: 22 m",
+   "pontos": [
+    "480012834",
+    "480012864",
+    "480012868",
+    "480012869",
+    "480014610"
+   ]
+  },
+  "SANTO AMARO": {
+   "fonte": "gold.ft_resumo_distrito#SANTO AMARO",
+   "bloco": "Distrito SANTO AMARO (subprefeitura SANTO AMARO): 275 pontos, índice médio 0.374, 62 na faixa alta, 624 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 720015753 | AV. ROQUE PETRONI JÚNIOR , 111 | distrito SANTO AMARO | posição 92 | índice 0.749 | faixa alta | ocorrências noturnas a 150 m: 31 | poste mais próximo: 21 m\n- ponto_id 720015754 | AV. ROQUE PETRONI JÚNIOR , 111 | distrito SANTO AMARO | posição 115 | índice 0.734 | faixa alta | ocorrências noturnas a 150 m: 31 | poste mais próximo: 19 m\n- ponto_id 7206892 | AL. STO. AMARO , 88 | distrito SANTO AMARO | posição 176 | índice 0.706 | faixa alta | ocorrências noturnas a 150 m: 25 | poste mais próximo: 18 m\n- ponto_id 7206859 | AL. STO. AMARO , 433 | distrito SANTO AMARO | posição 178 | índice 0.704 | faixa alta | ocorrências noturnas a 150 m: 19 | poste mais próximo: 23 m\n- ponto_id 720010469 | AV. PE. JOSÉ MARIA , 25 | distrito SANTO AMARO | posição 199 | índice 0.695 | faixa alta | ocorrências noturnas a 150 m: 20 | poste mais próximo: 20 m",
+   "pontos": [
+    "720010469",
+    "720015753",
+    "720015754",
+    "7206859",
+    "7206892"
+   ]
+  },
+  "PERDIZES": {
+   "fonte": "gold.ft_resumo_distrito#PERDIZES",
+   "bloco": "Distrito PERDIZES (subprefeitura LAPA): 142 pontos, índice médio 0.371, 33 na faixa alta, 552 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 6110837 | AV. SUMARÉ , 73 | distrito PERDIZES | posição 143 | índice 0.720 | faixa alta | ocorrências noturnas a 150 m: 35 | poste mais próximo: 17 m\n- ponto_id 6114502 | AV. SUMARÉ , 78 | distrito PERDIZES | posição 156 | índice 0.715 | faixa alta | ocorrências noturnas a 150 m: 35 | poste mais próximo: 16 m\n- ponto_id 630016831 | R. HEITOR PENTEADO , 91 | distrito PERDIZES | posição 195 | índice 0.697 | faixa alta | ocorrências noturnas a 150 m: 17 | poste mais próximo: 25 m\n- ponto_id 610016736 | AV. DR. ARNALDO , 1338 | distrito PERDIZES | posição 359 | índice 0.643 | faixa alta | ocorrências noturnas a 150 m: 11 | poste mais próximo: 21 m\n- ponto_id 610014603 | R. CLÉLIA , 93 | distrito PERDIZES | posição 413 | índice 0.635 | faixa alta | ocorrências noturnas a 150 m: 14 | poste mais próximo: 17 m",
+   "pontos": [
+    "610014603",
+    "610016736",
+    "6110837",
+    "6114502",
+    "630016831"
+   ]
+  },
+  "BUTANTA": {
+   "fonte": "gold.ft_resumo_distrito#BUTANTA",
+   "bloco": "Distrito BUTANTA (subprefeitura BUTANTA): 189 pontos, índice médio 0.364, 35 na faixa alta, 326 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 1211381 | R. CAMARGO , 305 | distrito BUTANTA | posição 65 | índice 0.766 | faixa alta | ocorrências noturnas a 150 m: 33 | poste mais próximo: 27 m\n- ponto_id 120015847 | AV. DR. VITAL BRASIL , 139 | distrito BUTANTA | posição 100 | índice 0.743 | faixa alta | ocorrências noturnas a 150 m: 41 | poste mais próximo: 17 m\n- ponto_id 120015846 | AV. DR. VITAL BRASIL , 225 | distrito BUTANTA | posição 197 | índice 0.696 | faixa alta | ocorrências noturnas a 150 m: 50 | poste mais próximo: 14 m\n- ponto_id 1211393 | R. MMDC , 0 | distrito BUTANTA | posição 200 | índice 0.695 | faixa alta | ocorrências noturnas a 150 m: 36 | poste mais próximo: 15 m\n- ponto_id 1206709 | AV. DR. VITAL BRASIL , 108 | distrito BUTANTA | posição 397 | índice 0.637 | faixa alta | ocorrências noturnas a 150 m: 41 | poste mais próximo: 12 m",
+   "pontos": [
+    "120015846",
+    "120015847",
+    "1206709",
+    "1211381",
+    "1211393"
+   ]
+  },
+  "BELEM": {
+   "fonte": "gold.ft_resumo_distrito#BELEM",
+   "bloco": "Distrito BELEM (subprefeitura MOOCA): 111 pontos, índice médio 0.361, 19 na faixa alta, 344 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 80014492 | AV. CELSO GARCIA , 499 | distrito BELEM | posição 133 | índice 0.724 | faixa alta | ocorrências noturnas a 150 m: 49 | poste mais próximo: 15 m\n- ponto_id 80014474 | AV. CELSO GARCIA , 2477 | distrito BELEM | posição 355 | índice 0.645 | faixa alta | ocorrências noturnas a 150 m: 10 | poste mais próximo: 25 m\n- ponto_id 80014111 | R. SERRA DE JAIRÉ , 752 | distrito BELEM | posição 419 | índice 0.633 | faixa alta | ocorrências noturnas a 150 m: 9 | poste mais próximo: 24 m\n- ponto_id 80014491 | AV. CELSO GARCIA , 928 | distrito BELEM | posição 454 | índice 0.626 | faixa alta | ocorrências noturnas a 150 m: 11 | poste mais próximo: 18 m\n- ponto_id 810592 | PÇA. MJ. GUILHERME RUDGE , 59 | distrito BELEM | posição 463 | índice 0.624 | faixa alta | ocorrências noturnas a 150 m: 11 | poste mais próximo: 18 m",
+   "pontos": [
+    "80014111",
+    "80014474",
+    "80014491",
+    "80014492",
+    "810592"
+   ]
+  },
+  "VILA MARIANA": {
+   "fonte": "gold.ft_resumo_distrito#VILA MARIANA",
+   "bloco": "Distrito VILA MARIANA (subprefeitura VILA MARIANA): 238 pontos, índice médio 0.360, 49 na faixa alta, 578 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 920016731 | AV. PAULISTA , 171 | distrito VILA MARIANA | posição 86 | índice 0.750 | faixa alta | ocorrências noturnas a 150 m: 31 | poste mais próximo: 22 m\n- ponto_id 920015180 | AV. VINTE E TRÊS DE MAIO , 0 | distrito VILA MARIANA | posição 101 | índice 0.741 | faixa alta | ocorrências noturnas a 150 m: 40 | poste mais próximo: 17 m\n- ponto_id 920016403 | R. VERGUEIRO , 2575 | distrito VILA MARIANA | posição 118 | índice 0.733 | faixa alta | ocorrências noturnas a 150 m: 24 | poste mais próximo: 26 m\n- ponto_id 920015255 | R. RIO GRANDE , 799 | distrito VILA MARIANA | posição 144 | índice 0.720 | faixa alta | ocorrências noturnas a 150 m: 24 | poste mais próximo: 21 m\n- ponto_id 920015241 | R. JOAQUIM TÁVORA , 490 | distrito VILA MARIANA | posição 157 | índice 0.714 | faixa alta | ocorrências noturnas a 150 m: 20 | poste mais próximo: 26 m",
+   "pontos": [
+    "920015180",
+    "920015241",
+    "920015255",
+    "920016403",
+    "920016731"
+   ]
+  },
+  "VILA GUILHERME": {
+   "fonte": "gold.ft_resumo_distrito#VILA GUILHERME",
+   "bloco": "Distrito VILA GUILHERME (subprefeitura VILA MARIA-VILA GUILHERME): 166 pontos, índice médio 0.351, 31 na faixa alta, 239 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 880000943 | AV. OTTO BAUMGART , 268 | distrito VILA GUILHERME | posição 132 | índice 0.725 | faixa alta | ocorrências noturnas a 150 m: 23 | poste mais próximo: 23 m\n- ponto_id 8812600 | AV. OTTO BAUMGART , 0 | distrito VILA GUILHERME | posição 151 | índice 0.717 | faixa alta | ocorrências noturnas a 150 m: 24 | poste mais próximo: 20 m\n- ponto_id 880000941 | AV. OTTO BAUMGART , 268 | distrito VILA GUILHERME | posição 185 | índice 0.702 | faixa alta | ocorrências noturnas a 150 m: 22 | poste mais próximo: 19 m\n- ponto_id 880000942 | AV. OTTO BAUMGART , 268 | distrito VILA GUILHERME | posição 188 | índice 0.700 | faixa alta | ocorrências noturnas a 150 m: 24 | poste mais próximo: 18 m\n- ponto_id 880000944 | AV. OTTO BAUMGART , 324 | distrito VILA GUILHERME | posição 210 | índice 0.693 | faixa alta | ocorrências noturnas a 150 m: 23 | poste mais próximo: 18 m",
+   "pontos": [
+    "880000941",
+    "880000942",
+    "880000943",
+    "880000944",
+    "8812600"
+   ]
+  },
+  "MOEMA": {
+   "fonte": "gold.ft_resumo_distrito#MOEMA",
+   "bloco": "Distrito MOEMA (subprefeitura VILA MARIANA): 139 pontos, índice médio 0.344, 19 na faixa alta, 381 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 530015153 | AV. PEDRO ALVARES CABRAL , 0 | distrito MOEMA | posição 472 | índice 0.623 | faixa alta | ocorrências noturnas a 150 m: 8 | poste mais próximo: 24 m\n- ponto_id 530015315 | AV. IBIRAPUERA , 3050 | distrito MOEMA | posição 547 | índice 0.608 | faixa alta | ocorrências noturnas a 150 m: 7 | poste mais próximo: 23 m\n- ponto_id 530015195 | AL. DOS NHAMBIQUARAS , 1951 | distrito MOEMA | posição 589 | índice 0.602 | faixa alta | ocorrências noturnas a 150 m: 7 | poste mais próximo: 21 m\n- ponto_id 5306705 | R. AFONSO BRAZ , 876 | distrito MOEMA | posição 616 | índice 0.597 | faixa alta | ocorrências noturnas a 150 m: 7 | poste mais próximo: 20 m\n- ponto_id 5306418 | AV. REPÚBLICA DO LÍBANO , 0 | distrito MOEMA | posição 893 | índice 0.566 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 31 m",
+   "pontos": [
+    "530015153",
+    "530015195",
+    "530015315",
+    "5306418",
+    "5306705"
+   ]
+  },
+  "CAMBUCI": {
+   "fonte": "gold.ft_resumo_distrito#CAMBUCI",
+   "bloco": "Distrito CAMBUCI (subprefeitura SE): 91 pontos, índice médio 0.341, 13 na faixa alta, 167 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 140016384 | R. CLÍMACO BARBOSA , 49 | distrito CAMBUCI | posição 666 | índice 0.590 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 22 m\n- ponto_id 140014284 | AV. DO ESTADO , 4505 | distrito CAMBUCI | posição 670 | índice 0.589 | faixa alta | ocorrências noturnas a 150 m: 30 | poste mais próximo: 12 m\n- ponto_id 1410076 | EST. ALBERTO LION , 6000 | distrito CAMBUCI | posição 710 | índice 0.584 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 29 m\n- ponto_id 1410079 | EST. ALBERTO LION , 6000 | distrito CAMBUCI | posição 738 | índice 0.582 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 25 m\n- ponto_id 1410017 | R. LUÍS GAMA , 803 | distrito CAMBUCI | posição 1027 | índice 0.555 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 22 m",
+   "pontos": [
+    "140014284",
+    "140016384",
+    "1410017",
+    "1410076",
+    "1410079"
+   ]
+  },
+  "LIMAO": {
+   "fonte": "gold.ft_resumo_distrito#LIMAO",
+   "bloco": "Distrito LIMAO (subprefeitura CASA VERDE-CACHOEIRINHA): 179 pontos, índice médio 0.330, 29 na faixa alta, 299 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 5011532 | AC. A AV. OTAVIANO ALVES DE LIMA , 1023 | distrito LIMAO | posição 291 | índice 0.661 | faixa alta | ocorrências noturnas a 150 m: 21 | poste mais próximo: 16 m\n- ponto_id 500005011 | AV. NSA. SRA. DO Ó , 1453 | distrito LIMAO | posição 327 | índice 0.651 | faixa alta | ocorrências noturnas a 150 m: 15 | poste mais próximo: 18 m\n- ponto_id 5013431 | AV. DEP. EMÍLIO CARLOS , 295 | distrito LIMAO | posição 411 | índice 0.635 | faixa alta | ocorrências noturnas a 150 m: 11 | poste mais próximo: 20 m\n- ponto_id 5013430 | R. DR. FREIRE CISNEIRO , 0 | distrito LIMAO | posição 424 | índice 0.632 | faixa alta | ocorrências noturnas a 150 m: 14 | poste mais próximo: 17 m\n- ponto_id 614560 | AV. COM. MARTINELLI , 0 | distrito LIMAO | posição 515 | índice 0.615 | faixa alta | ocorrências noturnas a 150 m: 11 | poste mais próximo: 18 m",
+   "pontos": [
+    "500005011",
+    "5011532",
+    "5013430",
+    "5013431",
+    "614560"
+   ]
+  },
+  "MORUMBI": {
+   "fonte": "gold.ft_resumo_distrito#MORUMBI",
+   "bloco": "Distrito MORUMBI (subprefeitura BUTANTA): 121 pontos, índice médio 0.322, 19 na faixa alta, 707 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 5507035 | AV. JULES RIMET , 205 | distrito MORUMBI | posição 49 | índice 0.780 | faixa alta | ocorrências noturnas a 150 m: 131 | poste mais próximo: 13 m\n- ponto_id 550011421 | AV. JORGE JOÃO SAAD , 161 | distrito MORUMBI | posição 140 | índice 0.722 | faixa alta | ocorrências noturnas a 150 m: 38 | poste mais próximo: 16 m\n- ponto_id 5506983 | AV. JORGE JOÃO SAAD , 1110 | distrito MORUMBI | posição 166 | índice 0.711 | faixa alta | ocorrências noturnas a 150 m: 19 | poste mais próximo: 28 m\n- ponto_id 5507005 | AV. JORGE JOÃO SAAD , 52 | distrito MORUMBI | posição 201 | índice 0.694 | faixa alta | ocorrências noturnas a 150 m: 30 | poste mais próximo: 16 m\n- ponto_id 550011420 | AV. JORGE JOÃO SAAD , 160 | distrito MORUMBI | posição 223 | índice 0.683 | faixa alta | ocorrências noturnas a 150 m: 40 | poste mais próximo: 14 m",
+   "pontos": [
+    "550011420",
+    "550011421",
+    "5506983",
+    "5507005",
+    "5507035"
+   ]
+  },
+  "SAO MIGUEL": {
+   "fonte": "gold.ft_resumo_distrito#SAO MIGUEL",
+   "bloco": "Distrito SAO MIGUEL (subprefeitura SAO MIGUEL): 168 pontos, índice médio 0.319, 18 na faixa alta, 280 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 7612095 | PÇA. PE. ALEIXO MONTEIRO MAFRA , 139 | distrito SAO MIGUEL | posição 106 | índice 0.737 | faixa alta | ocorrências noturnas a 150 m: 63 | poste mais próximo: 14 m\n- ponto_id 760012066 | PÇA. PE. ALEIXO MONTEIRO MAFRA , 19 | distrito SAO MIGUEL | posição 111 | índice 0.736 | faixa alta | ocorrências noturnas a 150 m: 61 | poste mais próximo: 15 m\n- ponto_id 7612125 | R. JOSÉ AUGUSTO DA SILVEIRA , 54 | distrito SAO MIGUEL | posição 246 | índice 0.675 | faixa alta | ocorrências noturnas a 150 m: 14 | poste mais próximo: 23 m\n- ponto_id 760012110 | AV. MAL. TITO , 1453 | distrito SAO MIGUEL | posição 574 | índice 0.604 | faixa alta | ocorrências noturnas a 150 m: 7 | poste mais próximo: 22 m\n- ponto_id 760012121 | AV. MAL. TITO , 1514 | distrito SAO MIGUEL | posição 807 | índice 0.573 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 19 m",
+   "pontos": [
+    "760012066",
+    "760012110",
+    "760012121",
+    "7612095",
+    "7612125"
+   ]
+  },
+  "CAMPO LIMPO": {
+   "fonte": "gold.ft_resumo_distrito#CAMPO LIMPO",
+   "bloco": "Distrito CAMPO LIMPO (subprefeitura CAMPO LIMPO): 324 pontos, índice médio 0.318, 26 na faixa alta, 426 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 1707399 | ESTR. DO CAMPO LIMPO , 6463 | distrito CAMPO LIMPO | posição 426 | índice 0.632 | faixa alta | ocorrências noturnas a 150 m: 12 | poste mais próximo: 18 m\n- ponto_id 1703527 | R. DR. JOVIANO PACHECO DE AGUIRRE , 85 | distrito CAMPO LIMPO | posição 530 | índice 0.611 | faixa alta | ocorrências noturnas a 150 m: 12 | poste mais próximo: 17 m\n- ponto_id 170011503 | AV. SÍLVIO RIBEIRO ARAGÃO , 288 | distrito CAMPO LIMPO | posição 623 | índice 0.597 | faixa alta | ocorrências noturnas a 150 m: 9 | poste mais próximo: 18 m\n- ponto_id 170011193 | ESTR. DO CAMPO LIMPO , 4062 | distrito CAMPO LIMPO | posição 680 | índice 0.588 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 21 m\n- ponto_id 1707440 | AV. CARLOS LACERDA , 555 | distrito CAMPO LIMPO | posição 735 | índice 0.582 | faixa alta | ocorrências noturnas a 150 m: 7 | poste mais próximo: 18 m",
+   "pontos": [
+    "170011193",
+    "170011503",
+    "1703527",
+    "1707399",
+    "1707440"
+   ]
+  },
+  "PENHA": {
+   "fonte": "gold.ft_resumo_distrito#PENHA",
+   "bloco": "Distrito PENHA (subprefeitura PENHA): 314 pontos, índice médio 0.318, 25 na faixa alta, 244 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 600012463 | METRÔ PENHA , 0 | distrito PENHA | posição 328 | índice 0.650 | faixa alta | ocorrências noturnas a 150 m: 10 | poste mais próximo: 46 m\n- ponto_id 600012462 | METRÔ PENHA , 0 | distrito PENHA | posição 337 | índice 0.648 | faixa alta | ocorrências noturnas a 150 m: 10 | poste mais próximo: 29 m\n- ponto_id 600012461 | METRÔ PENHA , 0 | distrito PENHA | posição 383 | índice 0.639 | faixa alta | ocorrências noturnas a 150 m: 9 | poste mais próximo: 32 m\n- ponto_id 600012469 | METRÔ PENHA , 0 | distrito PENHA | posição 483 | índice 0.621 | faixa alta | ocorrências noturnas a 150 m: 9 | poste mais próximo: 20 m\n- ponto_id 600012522 | R. COM. CANTINHO , 524 | distrito PENHA | posição 496 | índice 0.618 | faixa alta | ocorrências noturnas a 150 m: 9 | poste mais próximo: 20 m",
+   "pontos": [
+    "600012461",
+    "600012462",
+    "600012463",
+    "600012469",
+    "600012522"
+   ]
+  },
+  "VILA MARIA": {
+   "fonte": "gold.ft_resumo_distrito#VILA MARIA",
+   "bloco": "Distrito VILA MARIA (subprefeitura VILA MARIA-VILA GUILHERME): 265 pontos, índice médio 0.318, 29 na faixa alta, 272 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 9110540 | AV. GUILHERME COTCHING , 434 | distrito VILA MARIA | posição 192 | índice 0.699 | faixa alta | ocorrências noturnas a 150 m: 20 | poste mais próximo: 20 m\n- ponto_id 910000851 | R. DOS CONDOREIROS , 400 | distrito VILA MARIA | posição 542 | índice 0.610 | faixa alta | ocorrências noturnas a 150 m: 9 | poste mais próximo: 19 m\n- ponto_id 910000868 | AV. GUILHERME COTCHING , 1298 | distrito VILA MARIA | posição 554 | índice 0.607 | faixa alta | ocorrências noturnas a 150 m: 9 | poste mais próximo: 18 m\n- ponto_id 910000861 | R. GALILEU GAIA , 557 | distrito VILA MARIA | posição 576 | índice 0.603 | faixa alta | ocorrências noturnas a 150 m: 7 | poste mais próximo: 22 m\n- ponto_id 910000871 | AV. GUILHERME COTCHING , 647 | distrito VILA MARIA | posição 642 | índice 0.593 | faixa alta | ocorrências noturnas a 150 m: 17 | poste mais próximo: 14 m",
+   "pontos": [
+    "910000851",
+    "910000861",
+    "910000868",
+    "910000871",
+    "9110540"
+   ]
+  },
+  "CAPAO REDONDO": {
+   "fonte": "gold.ft_resumo_distrito#CAPAO REDONDO",
+   "bloco": "Distrito CAPAO REDONDO (subprefeitura CAMPO LIMPO): 373 pontos, índice médio 0.317, 38 na faixa alta, 641 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 190011835 | ESTR. DE ITAPECERICA , 4092 | distrito CAPAO REDONDO | posição 17 | índice 0.825 | faixa alta | ocorrências noturnas a 150 m: 98 | poste mais próximo: 17 m\n- ponto_id 190011857 | AV. CARLOS CALDEIRA FILHO , 0 | distrito CAPAO REDONDO | posição 35 | índice 0.795 | faixa alta | ocorrências noturnas a 150 m: 113 | poste mais próximo: 14 m\n- ponto_id 1903890 | AV. PROF. DR. TELÊMACO H. M. VAN LANGENDONCK , 20 | distrito CAPAO REDONDO | posição 37 | índice 0.795 | faixa alta | ocorrências noturnas a 150 m: 51 | poste mais próximo: 20 m\n- ponto_id 1900963 | R. TÚLIO MUGNAINI , 66 | distrito CAPAO REDONDO | posição 303 | índice 0.659 | faixa alta | ocorrências noturnas a 150 m: 59 | poste mais próximo: 12 m\n- ponto_id 1903982 | ESTR. DE ITAPECERICA , 3864 | distrito CAPAO REDONDO | posição 326 | índice 0.651 | faixa alta | ocorrências noturnas a 150 m: 15 | poste mais próximo: 18 m",
+   "pontos": [
+    "190011835",
+    "190011857",
+    "1900963",
+    "1903890",
+    "1903982"
+   ]
+  },
+  "MOOCA": {
+   "fonte": "gold.ft_resumo_distrito#MOOCA",
+   "bloco": "Distrito MOOCA (subprefeitura MOOCA): 178 pontos, índice médio 0.313, 17 na faixa alta, 227 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 540014257 | R. IPANEMA , 686 | distrito MOOCA | posição 365 | índice 0.642 | faixa alta | ocorrências noturnas a 150 m: 11 | poste mais próximo: 21 m\n- ponto_id 540014253 | R. IPANEMA , 552 | distrito MOOCA | posição 522 | índice 0.613 | faixa alta | ocorrências noturnas a 150 m: 12 | poste mais próximo: 17 m\n- ponto_id 540014152 | AV. PAES DE BARROS , 844 | distrito MOOCA | posição 750 | índice 0.580 | faixa alta | ocorrências noturnas a 150 m: 7 | poste mais próximo: 18 m\n- ponto_id 540014459 | R. VISC. DE INHOMIRIM , 818 | distrito MOOCA | posição 799 | índice 0.574 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 22 m\n- ponto_id 5410051 | R. TAQUARI , 778 | distrito MOOCA | posição 865 | índice 0.568 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 18 m",
+   "pontos": [
+    "540014152",
+    "540014253",
+    "540014257",
+    "540014459",
+    "5410051"
+   ]
+  },
+  "CIDADE ADEMAR": {
+   "fonte": "gold.ft_resumo_distrito#CIDADE ADEMAR",
+   "bloco": "Distrito CIDADE ADEMAR (subprefeitura CIDADE ADEMAR): 342 pontos, índice médio 0.312, 39 na faixa alta, 323 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 2203152 | AV. CUPECE , 2933 | distrito CIDADE ADEMAR | posição 442 | índice 0.628 | faixa alta | ocorrências noturnas a 150 m: 8 | poste mais próximo: 32 m\n- ponto_id 220015548 | AV. WASHINGTON LUIZ , 3742 | distrito CIDADE ADEMAR | posição 503 | índice 0.617 | faixa alta | ocorrências noturnas a 150 m: 8 | poste mais próximo: 22 m\n- ponto_id 220007962 | R. PST. RUBENS LOPES , 191 | distrito CIDADE ADEMAR | posição 529 | índice 0.612 | faixa alta | ocorrências noturnas a 150 m: 8 | poste mais próximo: 21 m\n- ponto_id 220013847 | AV. CUPECE , 2933 | distrito CIDADE ADEMAR | posição 555 | índice 0.606 | faixa alta | ocorrências noturnas a 150 m: 8 | poste mais próximo: 20 m\n- ponto_id 220013749 | AV. YERVANT KISSAJIKIAN , 3791 | distrito CIDADE ADEMAR | posição 561 | índice 0.605 | faixa alta | ocorrências noturnas a 150 m: 8 | poste mais próximo: 20 m",
+   "pontos": [
+    "220007962",
+    "220013749",
+    "220013847",
+    "220015548",
+    "2203152"
+   ]
+  },
+  "CAMPO GRANDE": {
+   "fonte": "gold.ft_resumo_distrito#CAMPO GRANDE",
+   "bloco": "Distrito CAMPO GRANDE (subprefeitura SANTO AMARO): 192 pontos, índice médio 0.311, 19 na faixa alta, 203 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 160010024 | R. GALENO DE CASTRO , 112 | distrito CAMPO GRANDE | posição 91 | índice 0.749 | faixa alta | ocorrências noturnas a 150 m: 45 | poste mais próximo: 17 m\n- ponto_id 160010440 | R. VICENTINA GOMES , 102 | distrito CAMPO GRANDE | posição 128 | índice 0.728 | faixa alta | ocorrências noturnas a 150 m: 23 | poste mais próximo: 25 m\n- ponto_id 1603069 | R. CRISTALINO ROLIM DE FREITAS , 75 | distrito CAMPO GRANDE | posição 207 | índice 0.693 | faixa alta | ocorrências noturnas a 150 m: 63 | poste mais próximo: 13 m\n- ponto_id 160015538 | AV. INTERLAGOS , 2729 | distrito CAMPO GRANDE | posição 312 | índice 0.655 | faixa alta | ocorrências noturnas a 150 m: 11 | poste mais próximo: 25 m\n- ponto_id 160015616 | AV. DAS NAÇÕES UNIDAS , 20882 | distrito CAMPO GRANDE | posição 367 | índice 0.642 | faixa alta | ocorrências noturnas a 150 m: 10 | poste mais próximo: 23 m",
+   "pontos": [
+    "160010024",
+    "160010440",
+    "160015538",
+    "160015616",
+    "1603069"
+   ]
+  },
+  "VILA ANDRADE": {
+   "fonte": "gold.ft_resumo_distrito#VILA ANDRADE",
+   "bloco": "Distrito VILA ANDRADE (subprefeitura CAMPO LIMPO): 145 pontos, índice médio 0.307, 21 na faixa alta, 222 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 8506782 | AV. DAS BELEZAS , 0 | distrito VILA ANDRADE | posição 485 | índice 0.620 | faixa alta | ocorrências noturnas a 150 m: 11 | poste mais próximo: 18 m\n- ponto_id 850011315 | AV. GIOVANNI GRONCHI , 5812 | distrito VILA ANDRADE | posição 520 | índice 0.613 | faixa alta | ocorrências noturnas a 150 m: 8 | poste mais próximo: 21 m\n- ponto_id 8506727 | AV. MJ. SYLVIO DE MAGALHÃES PADILHA , 14500 | distrito VILA ANDRADE | posição 556 | índice 0.606 | faixa alta | ocorrências noturnas a 150 m: 7 | poste mais próximo: 22 m\n- ponto_id 850011167 | R. JOSÉ RAMON URTIZA , 45 | distrito VILA ANDRADE | posição 960 | índice 0.561 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 20 m\n- ponto_id 8506804 | R. ITAPAIÚNA , 2964 | distrito VILA ANDRADE | posição 983 | índice 0.559 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 23 m",
+   "pontos": [
+    "850011167",
+    "850011315",
+    "8506727",
+    "8506782",
+    "8506804"
+   ]
+  },
+  "VILA JACUI": {
+   "fonte": "gold.ft_resumo_distrito#VILA JACUI",
+   "bloco": "Distrito VILA JACUI (subprefeitura SAO MIGUEL): 195 pontos, índice médio 0.307, 14 na faixa alta, 289 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 8914814 | AV. DR. USSIEL CIRILO , 70 | distrito VILA JACUI | posição 287 | índice 0.662 | faixa alta | ocorrências noturnas a 150 m: 14 | poste mais próximo: 20 m\n- ponto_id 890004808 | ESTR. DO IMPERADOR , 2607 | distrito VILA JACUI | posição 445 | índice 0.628 | faixa alta | ocorrências noturnas a 150 m: 9 | poste mais próximo: 22 m\n- ponto_id 8914790 | AV. S. MIGUEL , 6687 | distrito VILA JACUI | posição 829 | índice 0.571 | faixa alta | ocorrências noturnas a 150 m: 10 | poste mais próximo: 15 m\n- ponto_id 890012087 | AV. S. MIGUEL , 6393 | distrito VILA JACUI | posição 930 | índice 0.564 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 18 m\n- ponto_id 890004797 | ESTR. DO IMPERADOR , 5001 | distrito VILA JACUI | posição 979 | índice 0.559 | faixa alta | ocorrências noturnas a 150 m: 12 | poste mais próximo: 14 m",
+   "pontos": [
+    "890004797",
+    "890004808",
+    "890012087",
+    "8914790",
+    "8914814"
+   ]
+  },
+  "SAUDE": {
+   "fonte": "gold.ft_resumo_distrito#SAUDE",
+   "bloco": "Distrito SAUDE (subprefeitura VILA MARIANA): 222 pontos, índice médio 0.307, 21 na faixa alta, 162 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 7906249 | R. PEREIRA ESTÉFANO , 80 | distrito SAUDE | posição 523 | índice 0.613 | faixa alta | ocorrências noturnas a 150 m: 12 | poste mais próximo: 17 m\n- ponto_id 790009967 | AV. INDIANÓPOLIS , 2751 | distrito SAUDE | posição 658 | índice 0.591 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 22 m\n- ponto_id 270016979 | AV. PROF. ABRAÃO DE MORAIS , 2201 | distrito SAUDE | posição 906 | índice 0.565 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 30 m\n- ponto_id 790016131 | AV. BOSQUE DA SAÚDE , 146 | distrito SAUDE | posição 909 | índice 0.565 | faixa alta | ocorrências noturnas a 150 m: 8 | poste mais próximo: 16 m\n- ponto_id 790016130 | R. GEN. SERRA MARTINS , 68 | distrito SAUDE | posição 1126 | índice 0.547 | faixa alta | ocorrências noturnas a 150 m: 10 | poste mais próximo: 14 m",
+   "pontos": [
+    "270016979",
+    "790009967",
+    "790016130",
+    "790016131",
+    "7906249"
+   ]
+  },
+  "CACHOEIRINHA": {
+   "fonte": "gold.ft_resumo_distrito#CACHOEIRINHA",
+   "bloco": "Distrito CACHOEIRINHA (subprefeitura CASA VERDE-CACHOEIRINHA): 252 pontos, índice médio 0.307, 21 na faixa alta, 244 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 1313526 | AV. INAJAR DE SOUZA , 3500 | distrito CACHOEIRINHA | posição 392 | índice 0.638 | faixa alta | ocorrências noturnas a 150 m: 9 | poste mais próximo: 29 m\n- ponto_id 130001579 | R. ÍNDIO PERY , 40 | distrito CACHOEIRINHA | posição 436 | índice 0.630 | faixa alta | ocorrências noturnas a 150 m: 9 | poste mais próximo: 22 m\n- ponto_id 130001514 | AV. PARADA PINTO , 79 | distrito CACHOEIRINHA | posição 456 | índice 0.626 | faixa alta | ocorrências noturnas a 150 m: 9 | poste mais próximo: 21 m\n- ponto_id 130001304 | AV. INAJAR DE SOUZA , 3745 | distrito CACHOEIRINHA | posição 466 | índice 0.624 | faixa alta | ocorrências noturnas a 150 m: 10 | poste mais próximo: 19 m\n- ponto_id 130001530 | AV. PARADA PINTO , 2335 | distrito CACHOEIRINHA | posição 671 | índice 0.589 | faixa alta | ocorrências noturnas a 150 m: 11 | poste mais próximo: 16 m",
+   "pontos": [
+    "130001304",
+    "130001514",
+    "130001530",
+    "130001579",
+    "1313526"
+   ]
+  },
+  "SOCORRO": {
+   "fonte": "gold.ft_resumo_distrito#SOCORRO",
+   "bloco": "Distrito SOCORRO (subprefeitura CAPELA DO SOCORRO): 97 pontos, índice médio 0.306, 4 na faixa alta, 124 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 810011976 | AV. GUARAPIRANGA , 751 | distrito SOCORRO | posição 1227 | índice 0.540 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 19 m\n- ponto_id 810009942 | AV. ATLÂNTICA , 748 | distrito SOCORRO | posição 1529 | índice 0.522 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 20 m\n- ponto_id 810009906 | AV. DO RIO BONITO , 1111 | distrito SOCORRO | posição 2080 | índice 0.496 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 16 m\n- ponto_id 810009911 | R. OLIVIA GUEDES PENTEADO , 1175 | distrito SOCORRO | posição 2087 | índice 0.496 | faixa alta | ocorrências noturnas a 150 m: 2 | poste mais próximo: 21 m\n- ponto_id 810011965 | R. DR. MAURO PAES DE ALMEIDA , 177 | distrito SOCORRO | posição 2270 | índice 0.489 | faixa media | ocorrências noturnas a 150 m: 2 | poste mais próximo: 20 m",
+   "pontos": [
+    "810009906",
+    "810009911",
+    "810009942",
+    "810011965",
+    "810011976"
+   ]
+  },
+  "FREGUESIA DO O": {
+   "fonte": "gold.ft_resumo_distrito#FREGUESIA DO O",
+   "bloco": "Distrito FREGUESIA DO O (subprefeitura FREGUESIA-BRASILANDIA): 276 pontos, índice médio 0.306, 26 na faixa alta, 309 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 290000028 | AV. NSA. SRA. DO Ó , 1865 | distrito FREGUESIA DO O | posição 212 | índice 0.692 | faixa alta | ocorrências noturnas a 150 m: 21 | poste mais próximo: 19 m\n- ponto_id 290001392 | AV. GEN. EDGAR FACÓ , 720 | distrito FREGUESIA DO O | posição 455 | índice 0.626 | faixa alta | ocorrências noturnas a 150 m: 8 | poste mais próximo: 26 m\n- ponto_id 290001342 | AV. ITABERABA , 114 | distrito FREGUESIA DO O | posição 473 | índice 0.623 | faixa alta | ocorrências noturnas a 150 m: 15 | poste mais próximo: 16 m\n- ponto_id 2914602 | R. ENG. EDGARD FERREIRA DE BARROS JR , 75 | distrito FREGUESIA DO O | posição 736 | índice 0.582 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 20 m\n- ponto_id 290001352 | R. SETE BARRAS , 268 | distrito FREGUESIA DO O | posição 770 | índice 0.577 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 22 m",
+   "pontos": [
+    "290000028",
+    "290001342",
+    "290001352",
+    "290001392",
+    "2914602"
+   ]
+  },
+  "VILA LEOPOLDINA": {
+   "fonte": "gold.ft_resumo_distrito#VILA LEOPOLDINA",
+   "bloco": "Distrito VILA LEOPOLDINA (subprefeitura LAPA): 91 pontos, índice médio 0.306, 12 na faixa alta, 181 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 900014659 | R. GUAIPÁ , 1399 | distrito VILA LEOPOLDINA | posição 592 | índice 0.602 | faixa alta | ocorrências noturnas a 150 m: 7 | poste mais próximo: 21 m\n- ponto_id 9011658 | AV. DR. GASTÃO VIDIGAL , 1450 | distrito VILA LEOPOLDINA | posição 602 | índice 0.600 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 27 m\n- ponto_id 900014861 | VIAD. DOMINGOS DE MORAES , 0 | distrito VILA LEOPOLDINA | posição 976 | índice 0.560 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 19 m\n- ponto_id 900014756 | AV. QUEIROZ FILHO , 680 | distrito VILA LEOPOLDINA | posição 996 | índice 0.558 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 18 m\n- ponto_id 20015897 | AV. QUEIROZ FILHO , 1205 | distrito VILA LEOPOLDINA | posição 1365 | índice 0.532 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 16 m",
+   "pontos": [
+    "20015897",
+    "900014659",
+    "900014756",
+    "900014861",
+    "9011658"
+   ]
+  },
+  "ITAIM PAULISTA": {
+   "fonte": "gold.ft_resumo_distrito#ITAIM PAULISTA",
+   "bloco": "Distrito ITAIM PAULISTA (subprefeitura ITAIM PAULISTA): 363 pontos, índice médio 0.306, 27 na faixa alta, 364 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 350012102 | AV. MAL. TITO , 4537 | distrito ITAIM PAULISTA | posição 284 | índice 0.663 | faixa alta | ocorrências noturnas a 150 m: 13 | poste mais próximo: 22 m\n- ponto_id 350006102 | R. RAFAEL CORREIA DA SILVA , 94 | distrito ITAIM PAULISTA | posição 415 | índice 0.634 | faixa alta | ocorrências noturnas a 150 m: 13 | poste mais próximo: 18 m\n- ponto_id 350012101 | AV. MAL. TITO , 5215 | distrito ITAIM PAULISTA | posição 501 | índice 0.618 | faixa alta | ocorrências noturnas a 150 m: 10 | poste mais próximo: 19 m\n- ponto_id 350002411 | AV. BR. DE ALAGOAS , 329 | distrito ITAIM PAULISTA | posição 621 | índice 0.597 | faixa alta | ocorrências noturnas a 150 m: 10 | poste mais próximo: 17 m\n- ponto_id 350006105 | AV. MAL. TITO , 6380 | distrito ITAIM PAULISTA | posição 707 | índice 0.585 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 29 m",
+   "pontos": [
+    "350002411",
+    "350006102",
+    "350006105",
+    "350012101",
+    "350012102"
+   ]
+  },
+  "ITAQUERA": {
+   "fonte": "gold.ft_resumo_distrito#ITAQUERA",
+   "bloco": "Distrito ITAQUERA (subprefeitura ITAQUERA): 423 pontos, índice médio 0.306, 33 na faixa alta, 435 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 360007533 | R. AMÉRICO SALVADOR NOVELLI , 299 | distrito ITAQUERA | posição 417 | índice 0.634 | faixa alta | ocorrências noturnas a 150 m: 10 | poste mais próximo: 21 m\n- ponto_id 3609189 | AV. MIGUEL IGNÁCIO CURI , 111 | distrito ITAQUERA | posição 546 | índice 0.609 | faixa alta | ocorrências noturnas a 150 m: 13 | poste mais próximo: 16 m\n- ponto_id 360004461 | AV. DAS ALAMANDAS , 71 | distrito ITAQUERA | posição 558 | índice 0.606 | faixa alta | ocorrências noturnas a 150 m: 8 | poste mais próximo: 20 m\n- ponto_id 360004893 | R. FONTOURA XAVIER , 820 | distrito ITAQUERA | posição 599 | índice 0.601 | faixa alta | ocorrências noturnas a 150 m: 7 | poste mais próximo: 21 m\n- ponto_id 3609055 | AV. MIGUEL IGNÁCIO CURI , 0 | distrito ITAQUERA | posição 692 | índice 0.586 | faixa alta | ocorrências noturnas a 150 m: 15 | poste mais próximo: 14 m",
+   "pontos": [
+    "360004461",
+    "360004893",
+    "360007533",
+    "3609055",
+    "3609189"
+   ]
+  },
+  "CIDADE TIRADENTES": {
+   "fonte": "gold.ft_resumo_distrito#CIDADE TIRADENTES",
+   "bloco": "Distrito CIDADE TIRADENTES (subprefeitura CIDADE TIRADENTES): 377 pontos, índice médio 0.305, 29 na faixa alta, 340 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 250005807 | AV. NASCER DO SOL , 319 | distrito CIDADE TIRADENTES | posição 541 | índice 0.610 | faixa alta | ocorrências noturnas a 150 m: 17 | poste mais próximo: 15 m\n- ponto_id 2515442 | R. BR. BARROSO DO AMAZONAS , 78 | distrito CIDADE TIRADENTES | posição 543 | índice 0.609 | faixa alta | ocorrências noturnas a 150 m: 7 | poste mais próximo: 24 m\n- ponto_id 2515210 | R. IGARAPÉ DO FRADE , 10 | distrito CIDADE TIRADENTES | posição 601 | índice 0.600 | faixa alta | ocorrências noturnas a 150 m: 8 | poste mais próximo: 19 m\n- ponto_id 250005845 | AV. DOS METALÚRGICOS , 0 | distrito CIDADE TIRADENTES | posição 663 | índice 0.590 | faixa alta | ocorrências noturnas a 150 m: 10 | poste mais próximo: 16 m\n- ponto_id 2515307 | R. JOSÉ FRANCISCO BRANDÃO , 0 | distrito CIDADE TIRADENTES | posição 713 | índice 0.584 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 29 m",
+   "pontos": [
+    "250005807",
+    "250005845",
+    "2515210",
+    "2515307",
+    "2515442"
+   ]
+  },
+  "ARTUR ALVIM": {
+   "fonte": "gold.ft_resumo_distrito#ARTUR ALVIM",
+   "bloco": "Distrito ARTUR ALVIM (subprefeitura PENHA): 234 pontos, índice médio 0.305, 28 na faixa alta, 244 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 509115 | R. DR. LUIZ AIRES , 1908 | distrito ARTUR ALVIM | posição 107 | índice 0.737 | faixa alta | ocorrências noturnas a 150 m: 29 | poste mais próximo: 20 m\n- ponto_id 509079 | R. PEIXOTO WERNECK , 87 | distrito ARTUR ALVIM | posição 164 | índice 0.712 | faixa alta | ocorrências noturnas a 150 m: 24 | poste mais próximo: 20 m\n- ponto_id 50012398 | R. PEIXOTO WERNECK , 100 | distrito ARTUR ALVIM | posição 299 | índice 0.660 | faixa alta | ocorrências noturnas a 150 m: 23 | poste mais próximo: 16 m\n- ponto_id 509059 | R. DR. CAMPOS MOURA , 341 | distrito ARTUR ALVIM | posição 376 | índice 0.640 | faixa alta | ocorrências noturnas a 150 m: 27 | poste mais próximo: 14 m\n- ponto_id 50007759 | R. DR. LUIZ AIRES , 0 | distrito ARTUR ALVIM | posição 390 | índice 0.638 | faixa alta | ocorrências noturnas a 150 m: 37 | poste mais próximo: 13 m",
+   "pontos": [
+    "50007759",
+    "50012398",
+    "509059",
+    "509079",
+    "509115"
+   ]
+  },
+  "IPIRANGA": {
+   "fonte": "gold.ft_resumo_distrito#IPIRANGA",
+   "bloco": "Distrito IPIRANGA (subprefeitura IPIRANGA): 307 pontos, índice médio 0.302, 17 na faixa alta, 292 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 330017068 | R. CTE. TAYLOR , 1291 | distrito IPIRANGA | posição 325 | índice 0.651 | faixa alta | ocorrências noturnas a 150 m: 12 | poste mais próximo: 21 m\n- ponto_id 330010909 | R. LINO COUTINHO , 1929 | distrito IPIRANGA | posição 549 | índice 0.608 | faixa alta | ocorrências noturnas a 150 m: 8 | poste mais próximo: 20 m\n- ponto_id 3305795 | EST. CLUBE ATLÉTICO YPIRANGA , 8000 | distrito IPIRANGA | posição 918 | índice 0.565 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 28 m\n- ponto_id 3305799 | EST. CLUBE ATLÉTICO YPIRANGA , 8000 | distrito IPIRANGA | posição 925 | índice 0.564 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 27 m\n- ponto_id 3305203 | R. SALVADOR SIMÕES , 1033 | distrito IPIRANGA | posição 972 | índice 0.560 | faixa alta | ocorrências noturnas a 150 m: 7 | poste mais próximo: 17 m",
+   "pontos": [
+    "330010909",
+    "330017068",
+    "3305203",
+    "3305795",
+    "3305799"
+   ]
+  },
+  "JABAQUARA": {
+   "fonte": "gold.ft_resumo_distrito#JABAQUARA",
+   "bloco": "Distrito JABAQUARA (subprefeitura JABAQUARA): 367 pontos, índice médio 0.301, 41 na faixa alta, 335 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 3702829 | METRÔ CONCEIÇÃO , 996 | distrito JABAQUARA | posição 60 | índice 0.771 | faixa alta | ocorrências noturnas a 150 m: 34 | poste mais próximo: 31 m\n- ponto_id 3702832 | METRÔ CONCEIÇÃO , 0 | distrito JABAQUARA | posição 93 | índice 0.748 | faixa alta | ocorrências noturnas a 150 m: 31 | poste mais próximo: 21 m\n- ponto_id 3703072 | AV. ENG. ARMANDO DE ARRUDA PEREIRA , 803 | distrito JABAQUARA | posição 159 | índice 0.714 | faixa alta | ocorrências noturnas a 150 m: 33 | poste mais próximo: 17 m\n- ponto_id 370010115 | AV. DO CAFÉ , 77 | distrito JABAQUARA | posição 216 | índice 0.689 | faixa alta | ocorrências noturnas a 150 m: 28 | poste mais próximo: 16 m\n- ponto_id 370010241 | R. FARJALLA KORAICHO , 632 | distrito JABAQUARA | posição 261 | índice 0.669 | faixa alta | ocorrências noturnas a 150 m: 17 | poste mais próximo: 19 m",
+   "pontos": [
+    "370010115",
+    "370010241",
+    "3702829",
+    "3702832",
+    "3703072"
+   ]
+  },
+  "CASA VERDE": {
+   "fonte": "gold.ft_resumo_distrito#CASA VERDE",
+   "bloco": "Distrito CASA VERDE (subprefeitura CASA VERDE-CACHOEIRINHA): 217 pontos, índice médio 0.300, 15 na faixa alta, 236 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 210001463 | AV. OTAVIANO ALVES DE LIMA , 0 | distrito CASA VERDE | posição 119 | índice 0.733 | faixa alta | ocorrências noturnas a 150 m: 26 | poste mais próximo: 22 m\n- ponto_id 210017237 | R. BERNARDINO FANGANIELLO , 53 | distrito CASA VERDE | posição 254 | índice 0.672 | faixa alta | ocorrências noturnas a 150 m: 14 | poste mais próximo: 22 m\n- ponto_id 210002063 | R. BRAZELIZA ALVES DE CARVALHO , 113 | distrito CASA VERDE | posição 362 | índice 0.643 | faixa alta | ocorrências noturnas a 150 m: 12 | poste mais próximo: 20 m\n- ponto_id 210005067 | AV. IMIRIM , 2135 | distrito CASA VERDE | posição 409 | índice 0.636 | faixa alta | ocorrências noturnas a 150 m: 13 | poste mais próximo: 18 m\n- ponto_id 210000564 | AV. BRÁZ LEME , 278 | distrito CASA VERDE | posição 447 | índice 0.626 | faixa alta | ocorrências noturnas a 150 m: 8 | poste mais próximo: 28 m",
+   "pontos": [
+    "210000564",
+    "210001463",
+    "210002063",
+    "210005067",
+    "210017237"
+   ]
+  },
+  "CIDADE DUTRA": {
+   "fonte": "gold.ft_resumo_distrito#CIDADE DUTRA",
+   "bloco": "Distrito CIDADE DUTRA (subprefeitura CAPELA DO SOCORRO): 329 pontos, índice médio 0.295, 22 na faixa alta, 469 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 2314396 | AV. SEN. TEOTÔNIO VILELA , 6162 | distrito CIDADE DUTRA | posição 163 | índice 0.713 | faixa alta | ocorrências noturnas a 150 m: 44 | poste mais próximo: 15 m\n- ponto_id 230009563 | ESTR. DOS MENDES , 0 | distrito CIDADE DUTRA | posição 170 | índice 0.709 | faixa alta | ocorrências noturnas a 150 m: 27 | poste mais próximo: 18 m\n- ponto_id 230009847 | AV. SEN. TEOTÔNIO VILELA , 6000 | distrito CIDADE DUTRA | posição 189 | índice 0.700 | faixa alta | ocorrências noturnas a 150 m: 42 | poste mais próximo: 15 m\n- ponto_id 230009860 | AV. SEN. TEOTÔNIO VILELA , 6162 | distrito CIDADE DUTRA | posição 281 | índice 0.664 | faixa alta | ocorrências noturnas a 150 m: 44 | poste mais próximo: 13 m\n- ponto_id 230009653 | R. FREDERICO RENÉ DE JAEGHER , 74 | distrito CIDADE DUTRA | posição 431 | índice 0.631 | faixa alta | ocorrências noturnas a 150 m: 11 | poste mais próximo: 19 m",
+   "pontos": [
+    "230009563",
+    "230009653",
+    "230009847",
+    "230009860",
+    "2314396"
+   ]
+  },
+  "ERMELINO MATARAZZO": {
+   "fonte": "gold.ft_resumo_distrito#ERMELINO MATARAZZO",
+   "bloco": "Distrito ERMELINO MATARAZZO (subprefeitura ERMELINO MATARAZZO): 209 pontos, índice médio 0.294, 9 na faixa alta, 152 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 280004724 | AV. BOTURUSSU , 152 | distrito ERMELINO MATARAZZO | posição 900 | índice 0.566 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 20 m\n- ponto_id 2815250 | R. ABEL TAVARES , 2198 | distrito ERMELINO MATARAZZO | posição 924 | índice 0.564 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 27 m\n- ponto_id 2815251 | R. ABEL TAVARES , 2198 | distrito ERMELINO MATARAZZO | posição 1195 | índice 0.541 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 19 m\n- ponto_id 2808810 | AV. BOTURUSSU , 588 | distrito ERMELINO MATARAZZO | posição 1331 | índice 0.534 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 23 m\n- ponto_id 280004750 | AV. BOTURUSSU , 2098 | distrito ERMELINO MATARAZZO | posição 1563 | índice 0.519 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 15 m",
+   "pontos": [
+    "280004724",
+    "280004750",
+    "2808810",
+    "2815250",
+    "2815251"
+   ]
+  },
+  "JARDIM SAO LUIS": {
+   "fonte": "gold.ft_resumo_distrito#JARDIM SAO LUIS",
+   "bloco": "Distrito JARDIM SAO LUIS (subprefeitura M BOI MIRIM): 401 pontos, índice médio 0.292, 32 na faixa alta, 387 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 7206988 | AV. JOÃO DIAS , 5168 | distrito JARDIM SAO LUIS | posição 308 | índice 0.656 | faixa alta | ocorrências noturnas a 150 m: 14 | poste mais próximo: 19 m\n- ponto_id 1904011 | ESTR. DE ITAPECERICA , 2056 | distrito JARDIM SAO LUIS | posição 322 | índice 0.652 | faixa alta | ocorrências noturnas a 150 m: 16 | poste mais próximo: 18 m\n- ponto_id 450011929 | AV. CARLOS CALDEIRA FILHO , 234 | distrito JARDIM SAO LUIS | posição 335 | índice 0.649 | faixa alta | ocorrências noturnas a 150 m: 11 | poste mais próximo: 22 m\n- ponto_id 450011991 | AV. GUARAPIRANGA , 1821 | distrito JARDIM SAO LUIS | posição 387 | índice 0.639 | faixa alta | ocorrências noturnas a 150 m: 20 | poste mais próximo: 15 m\n- ponto_id 450011565 | AV. GUARAPIRANGA , 1834 | distrito JARDIM SAO LUIS | posição 565 | índice 0.605 | faixa alta | ocorrências noturnas a 150 m: 19 | poste mais próximo: 14 m",
+   "pontos": [
+    "1904011",
+    "450011565",
+    "450011929",
+    "450011991",
+    "7206988"
+   ]
+  },
+  "SACOMA": {
+   "fonte": "gold.ft_resumo_distrito#SACOMA",
+   "bloco": "Distrito SACOMA (subprefeitura IPIRANGA): 378 pontos, índice médio 0.291, 21 na faixa alta, 344 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 6905458 | PÇA. DR. CURADO FLEURI , 0 | distrito SACOMA | posição 936 | índice 0.563 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 26 m\n- ponto_id 690011034 | R. CEL. JOSÉ PIRES DE ANDRADE , 845 | distrito SACOMA | posição 999 | índice 0.557 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 22 m\n- ponto_id 690006988 | R. MAL. VIEIRA PEIXOTO , 189 | distrito SACOMA | posição 1078 | índice 0.551 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 21 m\n- ponto_id 6905440 | ESTR. DAS LÁGRIMAS , 2083 | distrito SACOMA | posição 1098 | índice 0.549 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 17 m\n- ponto_id 690017089 | AV. MARGINAL DIREITA ANCHIETA , 12000 | distrito SACOMA | posição 1171 | índice 0.543 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 41 m",
+   "pontos": [
+    "690006988",
+    "690011034",
+    "690017089",
+    "6905440",
+    "6905458"
+   ]
+  },
+  "GUAIANASES": {
+   "fonte": "gold.ft_resumo_distrito#GUAIANASES",
+   "bloco": "Distrito GUAIANASES (subprefeitura GUAIANASES): 211 pontos, índice médio 0.291, 17 na faixa alta, 232 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 310008406 | R. SALVADOR GIANETTI , 0 | distrito GUAIANASES | posição 70 | índice 0.765 | faixa alta | ocorrências noturnas a 150 m: 32 | poste mais próximo: 31 m\n- ponto_id 470008392 | R. SALVADOR GIANETTI , 0 | distrito GUAIANASES | posição 76 | índice 0.760 | faixa alta | ocorrências noturnas a 150 m: 34 | poste mais próximo: 22 m\n- ponto_id 310008128 | R. CARANAÍBA , 0 | distrito GUAIANASES | posição 116 | índice 0.734 | faixa alta | ocorrências noturnas a 150 m: 24 | poste mais próximo: 27 m\n- ponto_id 4715227 | R. COPENHAGUE , 440 | distrito GUAIANASES | posição 324 | índice 0.652 | faixa alta | ocorrências noturnas a 150 m: 17 | poste mais próximo: 17 m\n- ponto_id 3115211 | R. SALVADOR GIANETTI , 760 | distrito GUAIANASES | posição 364 | índice 0.643 | faixa alta | ocorrências noturnas a 150 m: 35 | poste mais próximo: 13 m",
+   "pontos": [
+    "310008128",
+    "310008406",
+    "3115211",
+    "470008392",
+    "4715227"
+   ]
+  },
+  "JAGUARE": {
+   "fonte": "gold.ft_resumo_distrito#JAGUARE",
+   "bloco": "Distrito JAGUARE (subprefeitura LAPA): 115 pontos, índice médio 0.291, 11 na faixa alta, 152 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 400015904 | AV. JAGUARÉ , 247 | distrito JAGUARE | posição 714 | índice 0.584 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 29 m\n- ponto_id 4000796 | AV. LEÃO MACHADO , 0 | distrito JAGUARE | posição 886 | índice 0.566 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 32 m\n- ponto_id 4000805 | AV. PRES. ALTINO , 1881 | distrito JAGUARE | posição 1006 | índice 0.556 | faixa alta | ocorrências noturnas a 150 m: 7 | poste mais próximo: 16 m\n- ponto_id 400010383 | AV. ANTONIO DE SOUZA NOSCHESE , 203 | distrito JAGUARE | posição 1095 | índice 0.549 | faixa alta | ocorrências noturnas a 150 m: 10 | poste mais próximo: 14 m\n- ponto_id 400015891 | AV. JAGUARÉ , 259 | distrito JAGUARE | posição 1181 | índice 0.543 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 18 m",
+   "pontos": [
+    "400010383",
+    "400015891",
+    "400015904",
+    "4000796",
+    "4000805"
+   ]
+  },
+  "SAO MATEUS": {
+   "fonte": "gold.ft_resumo_distrito#SAO MATEUS",
+   "bloco": "Distrito SAO MATEUS (subprefeitura SAO MATEUS): 323 pontos, índice médio 0.291, 25 na faixa alta, 304 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 7503994 | AV. ADÉLIA CHOHFI , 111 | distrito SAO MATEUS | posição 196 | índice 0.696 | faixa alta | ocorrências noturnas a 150 m: 34 | poste mais próximo: 16 m\n- ponto_id 750006127 | AV. MATEO BEI , 3419 | distrito SAO MATEUS | posição 353 | índice 0.645 | faixa alta | ocorrências noturnas a 150 m: 15 | poste mais próximo: 18 m\n- ponto_id 750006136 | AV. MATEO BEI , 2511 | distrito SAO MATEUS | posição 514 | índice 0.615 | faixa alta | ocorrências noturnas a 150 m: 9 | poste mais próximo: 20 m\n- ponto_id 750005482 | AV. DA BARREIRA GRANDE , 3694 | distrito SAO MATEUS | posição 595 | índice 0.601 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 31 m\n- ponto_id 750006128 | AV. MATEO BEI , 3371 | distrito SAO MATEUS | posição 689 | índice 0.586 | faixa alta | ocorrências noturnas a 150 m: 9 | poste mais próximo: 17 m",
+   "pontos": [
+    "750005482",
+    "750006127",
+    "750006128",
+    "750006136",
+    "7503994"
+   ]
+  },
+  "BRASILANDIA": {
+   "fonte": "gold.ft_resumo_distrito#BRASILANDIA",
+   "bloco": "Distrito BRASILANDIA (subprefeitura FREGUESIA-BRASILANDIA): 332 pontos, índice médio 0.289, 21 na faixa alta, 343 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 110001088 | R. MANOEL AQUILINO DOS SANTOS , 732 | distrito BRASILANDIA | posição 531 | índice 0.611 | faixa alta | ocorrências noturnas a 150 m: 8 | poste mais próximo: 20 m\n- ponto_id 110001191 | R. PARAPUÃ , 1554 | distrito BRASILANDIA | posição 548 | índice 0.608 | faixa alta | ocorrências noturnas a 150 m: 10 | poste mais próximo: 18 m\n- ponto_id 110001030 | AV. DEP. CANTIDIO SAMPAIO , 3019 | distrito BRASILANDIA | posição 905 | índice 0.566 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 30 m\n- ponto_id 1114349 | AV. DEP. CANTIDIO SAMPAIO , 4595 | distrito BRASILANDIA | posição 1057 | índice 0.553 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 17 m\n- ponto_id 1114361 | AV. DEP. CANTIDIO SAMPAIO , 2775 | distrito BRASILANDIA | posição 1166 | índice 0.544 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 17 m",
+   "pontos": [
+    "110001030",
+    "110001088",
+    "110001191",
+    "1114349",
+    "1114361"
+   ]
+  },
+  "CAMPO BELO": {
+   "fonte": "gold.ft_resumo_distrito#CAMPO BELO",
+   "bloco": "Distrito CAMPO BELO (subprefeitura SANTO AMARO): 108 pontos, índice médio 0.289, 9 na faixa alta, 140 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 1506190 | AV. JORN. ROBERTO MARINHO , 3228 | distrito CAMPO BELO | posição 1173 | índice 0.543 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 40 m\n- ponto_id 150010308 | AV. STA. CATARINA , 440 | distrito CAMPO BELO | posição 1327 | índice 0.534 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 19 m\n- ponto_id 150010284 | R. DR. JESUÍNO MACIEL , 1275 | distrito CAMPO BELO | posição 1623 | índice 0.514 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 19 m\n- ponto_id 150015666 | AV. JORN. ROBERTO MARINHO , 2800 | distrito CAMPO BELO | posição 1702 | índice 0.511 | faixa alta | ocorrências noturnas a 150 m: 2 | poste mais próximo: 28 m\n- ponto_id 150015663 | AV. VER. JOSÉ DINIZ , 3360 | distrito CAMPO BELO | posição 1778 | índice 0.508 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 18 m",
+   "pontos": [
+    "150010284",
+    "150010308",
+    "150015663",
+    "150015666",
+    "1506190"
+   ]
+  },
+  "PIRITUBA": {
+   "fonte": "gold.ft_resumo_distrito#PIRITUBA",
+   "bloco": "Distrito PIRITUBA (subprefeitura PIRITUBA-JARAGUA): 371 pontos, índice médio 0.288, 25 na faixa alta, 283 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 640001405 | AV. GEN. EDGAR FACÓ , 1103 | distrito PIRITUBA | posição 357 | índice 0.644 | faixa alta | ocorrências noturnas a 150 m: 10 | poste mais próximo: 24 m\n- ponto_id 6415300 | AV. RAIMUNDO PEREIRA DE MAGALHÃES , 1465 | distrito PIRITUBA | posição 535 | índice 0.610 | faixa alta | ocorrências noturnas a 150 m: 7 | poste mais próximo: 24 m\n- ponto_id 6415293 | AV. OTAVIANO ALVES DE LIMA , 1230 | distrito PIRITUBA | posição 560 | índice 0.606 | faixa alta | ocorrências noturnas a 150 m: 17 | poste mais próximo: 15 m\n- ponto_id 640000349 | AV. RAIMUNDO PEREIRA DE MAGALHÃES , 1465 | distrito PIRITUBA | posição 723 | índice 0.583 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 20 m\n- ponto_id 6415395 | AV. RAIMUNDO PEREIRA DE MAGALHÃES , 1881 | distrito PIRITUBA | posição 789 | índice 0.574 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 19 m",
+   "pontos": [
+    "640000349",
+    "640001405",
+    "6415293",
+    "6415300",
+    "6415395"
+   ]
+  },
+  "TUCURUVI": {
+   "fonte": "gold.ft_resumo_distrito#TUCURUVI",
+   "bloco": "Distrito TUCURUVI (subprefeitura SANTANA-TUCURUVI): 180 pontos, índice médio 0.288, 12 na faixa alta, 163 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 840000676 | AV. TUCURUVI , 161 | distrito TUCURUVI | posição 276 | índice 0.666 | faixa alta | ocorrências noturnas a 150 m: 22 | poste mais próximo: 16 m\n- ponto_id 840000679 | AV. TUCURUVI , 808 | distrito TUCURUVI | posição 525 | índice 0.612 | faixa alta | ocorrências noturnas a 150 m: 21 | poste mais próximo: 14 m\n- ponto_id 840000585 | AV. NOVA CANTAREIRA , 1955 | distrito TUCURUVI | posição 895 | índice 0.566 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 31 m\n- ponto_id 840000586 | AV. NOVA CANTAREIRA , 1938 | distrito TUCURUVI | posição 1013 | índice 0.556 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 22 m\n- ponto_id 840000582 | AV. NOVA CANTAREIRA , 2475 | distrito TUCURUVI | posição 1333 | índice 0.534 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 23 m",
+   "pontos": [
+    "840000582",
+    "840000585",
+    "840000586",
+    "840000676",
+    "840000679"
+   ]
+  },
+  "VILA SONIA": {
+   "fonte": "gold.ft_resumo_distrito#VILA SONIA",
+   "bloco": "Distrito VILA SONIA (subprefeitura BUTANTA): 189 pontos, índice médio 0.286, 15 na faixa alta, 247 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 550011331 | AV. JORGE JOÃO SAAD , 560 | distrito VILA SONIA | posição 96 | índice 0.746 | faixa alta | ocorrências noturnas a 150 m: 29 | poste mais próximo: 22 m\n- ponto_id 960011369 | AV. PROF. FRANCISCO MORATO , 2710 | distrito VILA SONIA | posição 369 | índice 0.642 | faixa alta | ocorrências noturnas a 150 m: 21 | poste mais próximo: 15 m\n- ponto_id 5506955 | AV. JORGE JOÃO SAAD , 900 | distrito VILA SONIA | posição 559 | índice 0.606 | faixa alta | ocorrências noturnas a 150 m: 8 | poste mais próximo: 20 m\n- ponto_id 9607492 | AV. PROF. FRANCISCO MORATO , 4027 | distrito VILA SONIA | posição 825 | índice 0.571 | faixa alta | ocorrências noturnas a 150 m: 40 | poste mais próximo: 10 m\n- ponto_id 9607514 | R. HEITOR DOS PRAZERES , 187 | distrito VILA SONIA | posição 1103 | índice 0.548 | faixa alta | ocorrências noturnas a 150 m: 11 | poste mais próximo: 14 m",
+   "pontos": [
+    "550011331",
+    "5506955",
+    "960011369",
+    "9607492",
+    "9607514"
+   ]
+  },
+  "VILA MEDEIROS": {
+   "fonte": "gold.ft_resumo_distrito#VILA MEDEIROS",
+   "bloco": "Distrito VILA MEDEIROS (subprefeitura VILA MARIA-VILA GUILHERME): 230 pontos, índice médio 0.285, 13 na faixa alta, 161 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 9412669 | AV. ROLAND GARROS , 1662 | distrito VILA MEDEIROS | posição 464 | índice 0.624 | faixa alta | ocorrências noturnas a 150 m: 11 | poste mais próximo: 18 m\n- ponto_id 940003757 | AV. ROLAND GARROS , 1815 | distrito VILA MEDEIROS | posição 775 | índice 0.576 | faixa alta | ocorrências noturnas a 150 m: 9 | poste mais próximo: 16 m\n- ponto_id 9412698 | R. CAP. ALCOCK , 0 | distrito VILA MEDEIROS | posição 809 | índice 0.572 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 21 m\n- ponto_id 9412668 | AV. MILTON DA ROCHA , 66 | distrito VILA MEDEIROS | posição 1031 | índice 0.555 | faixa alta | ocorrências noturnas a 150 m: 9 | poste mais próximo: 15 m\n- ponto_id 940017228 | R. JAPI , 173 | distrito VILA MEDEIROS | posição 1276 | índice 0.537 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 24 m",
+   "pontos": [
+    "940003757",
+    "940017228",
+    "9412668",
+    "9412669",
+    "9412698"
+   ]
+  },
+  "CURSINO": {
+   "fonte": "gold.ft_resumo_distrito#CURSINO",
+   "bloco": "Distrito CURSINO (subprefeitura IPIRANGA): 235 pontos, índice médio 0.285, 9 na faixa alta, 147 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 270016276 | AV. DO CURSINO , 1750 | distrito CURSINO | posição 1117 | índice 0.547 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 17 m\n- ponto_id 270016184 | R. DO BOQUEIRÃO , 605 | distrito CURSINO | posição 1204 | índice 0.541 | faixa alta | ocorrências noturnas a 150 m: 9 | poste mais próximo: 14 m\n- ponto_id 270016182 | R. D. MACÁRIO , 199 | distrito CURSINO | posição 1336 | índice 0.534 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 22 m\n- ponto_id 270006918 | R. D. VILARES , 604 | distrito CURSINO | posição 1589 | índice 0.517 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 19 m\n- ponto_id 2705138 | AV. DO CURSINO , 794 | distrito CURSINO | posição 1701 | índice 0.511 | faixa alta | ocorrências noturnas a 150 m: 2 | poste mais próximo: 28 m",
+   "pontos": [
+    "270006918",
+    "270016182",
+    "270016184",
+    "270016276",
+    "2705138"
+   ]
+  },
+  "VILA CURUCA": {
+   "fonte": "gold.ft_resumo_distrito#VILA CURUCA",
+   "bloco": "Distrito VILA CURUCA (subprefeitura ITAIM PAULISTA): 277 pontos, índice médio 0.284, 17 na faixa alta, 227 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 860012123 | AV. MAL. TITO , 2253 | distrito VILA CURUCA | posição 597 | índice 0.601 | faixa alta | ocorrências noturnas a 150 m: 7 | poste mais próximo: 21 m\n- ponto_id 860012124 | AV. MAL. TITO , 2504 | distrito VILA CURUCA | posição 662 | índice 0.590 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 22 m\n- ponto_id 8615265 | R. TRÊS ILHAS , 5 | distrito VILA CURUCA | posição 690 | índice 0.586 | faixa alta | ocorrências noturnas a 150 m: 9 | poste mais próximo: 17 m\n- ponto_id 860002540 | AV. JOÃO BATISTA SANTIAGO , 1088 | distrito VILA CURUCA | posição 731 | índice 0.583 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 20 m\n- ponto_id 860012095 | AV. MAL. TITO , 3762 | distrito VILA CURUCA | posição 749 | índice 0.580 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 20 m",
+   "pontos": [
+    "860002540",
+    "860012095",
+    "860012123",
+    "860012124",
+    "8615265"
+   ]
+  },
+  "LAJEADO": {
+   "fonte": "gold.ft_resumo_distrito#LAJEADO",
+   "bloco": "Distrito LAJEADO (subprefeitura GUAIANASES): 238 pontos, índice médio 0.284, 17 na faixa alta, 225 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 470006116 | PLAT. EST. CPTM GUAIANASES LADO NORTE , 0 | distrito LAJEADO | posição 72 | índice 0.764 | faixa alta | ocorrências noturnas a 150 m: 32 | poste mais próximo: 29 m\n- ponto_id 470006118 | PLAT. EST. CPTM GUAIANASES LADO NORTE , 0 | distrito LAJEADO | posição 117 | índice 0.734 | faixa alta | ocorrências noturnas a 150 m: 26 | poste mais próximo: 22 m\n- ponto_id 470006117 | R. BENEDITO LEITE DE ÁVILA , 0 | distrito LAJEADO | posição 125 | índice 0.729 | faixa alta | ocorrências noturnas a 150 m: 29 | poste mais próximo: 19 m\n- ponto_id 470006120 | PLAT. EST. CPTM GUAIANASES LADO NORTE , 0 | distrito LAJEADO | posição 180 | índice 0.704 | faixa alta | ocorrências noturnas a 150 m: 30 | poste mais próximo: 17 m\n- ponto_id 470006122 | PLAT. EST. CPTM GUAIANASES LADO NORTE , 0 | distrito LAJEADO | posição 204 | índice 0.694 | faixa alta | ocorrências noturnas a 150 m: 32 | poste mais próximo: 16 m",
+   "pontos": [
+    "470006116",
+    "470006117",
+    "470006118",
+    "470006120",
+    "470006122"
+   ]
+  },
+  "JAGUARA": {
+   "fonte": "gold.ft_resumo_distrito#JAGUARA",
+   "bloco": "Distrito JAGUARA (subprefeitura LAPA): 101 pontos, índice médio 0.284, 8 na faixa alta, 87 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 390001828 | AV. MARGINAL DIREITA DO RIO TIETÊ , 810 | distrito JAGUARA | posição 341 | índice 0.647 | faixa alta | ocorrências noturnas a 150 m: 10 | poste mais próximo: 27 m\n- ponto_id 3911807 | AV. ALEXANDRE COLLARES , 32 | distrito JAGUARA | posição 694 | índice 0.586 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 36 m\n- ponto_id 9112487 | AV. MARGINAL DIREITA DO RIO TIETÊ , 500 | distrito JAGUARA | posição 724 | índice 0.583 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 20 m\n- ponto_id 3911587 | AV. CANDIDO PORTINARI , 185 | distrito JAGUARA | posição 1392 | índice 0.530 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 22 m\n- ponto_id 390001827 | AV. MARGINAL DIREITA DO RIO TIETÊ , 0 | distrito JAGUARA | posição 1422 | índice 0.529 | faixa alta | ocorrências noturnas a 150 m: 7 | poste mais próximo: 15 m",
+   "pontos": [
+    "390001827",
+    "390001828",
+    "3911587",
+    "3911807",
+    "9112487"
+   ]
+  },
+  "AGUA RASA": {
+   "fonte": "gold.ft_resumo_distrito#AGUA RASA",
+   "bloco": "Distrito AGUA RASA (subprefeitura MOOCA): 165 pontos, índice médio 0.281, 6 na faixa alta, 108 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 10008747 | AV. SAPOPEMBA , 2629 | distrito AGUA RASA | posição 1267 | índice 0.537 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 17 m\n- ponto_id 10008732 | AV. SAPOPEMBA , 331 | distrito AGUA RASA | posição 1285 | índice 0.536 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 24 m\n- ponto_id 10008750 | R. DR. GABRIEL DE RESENDE , 360 | distrito AGUA RASA | posição 1321 | índice 0.534 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 17 m\n- ponto_id 10012794 | AV. SAPOPEMBA , 3112 | distrito AGUA RASA | posição 1600 | índice 0.516 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 16 m\n- ponto_id 10008784 | AV. LUCA , 96 | distrito AGUA RASA | posição 1638 | índice 0.514 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 19 m",
+   "pontos": [
+    "10008732",
+    "10008747",
+    "10008750",
+    "10008784",
+    "10012794"
+   ]
+  },
+  "CARRAO": {
+   "fonte": "gold.ft_resumo_distrito#CARRAO",
+   "bloco": "Distrito CARRAO (subprefeitura ARICANDUVA-FORMOSA-CARRAO): 130 pontos, índice médio 0.280, 4 na faixa alta, 100 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 200012487 | AV. CDE. DE FRONTIN , 188 | distrito CARRAO | posição 703 | índice 0.585 | faixa alta | ocorrências noturnas a 150 m: 7 | poste mais próximo: 19 m\n- ponto_id 2009276 | R. ENG. PEGADO , 521 | distrito CARRAO | posição 1347 | índice 0.533 | faixa alta | ocorrências noturnas a 150 m: 7 | poste mais próximo: 15 m\n- ponto_id 2009263 | R. LUTÉCIA , 1730 | distrito CARRAO | posição 1831 | índice 0.506 | faixa alta | ocorrências noturnas a 150 m: 2 | poste mais próximo: 24 m\n- ponto_id 200008697 | R. NOVA JERUSALÉM , 1154 | distrito CARRAO | posição 1900 | índice 0.503 | faixa alta | ocorrências noturnas a 150 m: 2 | poste mais próximo: 22 m\n- ponto_id 200012648 | AV. ARICANDUVA , 500 | distrito CARRAO | posição 2225 | índice 0.490 | faixa media | ocorrências noturnas a 150 m: 2 | poste mais próximo: 20 m",
+   "pontos": [
+    "200008697",
+    "200012487",
+    "200012648",
+    "2009263",
+    "2009276"
+   ]
+  },
+  "RIO PEQUENO": {
+   "fonte": "gold.ft_resumo_distrito#RIO PEQUENO",
+   "bloco": "Distrito RIO PEQUENO (subprefeitura BUTANTA): 187 pontos, índice médio 0.279, 9 na faixa alta, 160 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 680017123 | AV. DO RIO PEQUENO , 1207 | distrito RIO PEQUENO | posição 1145 | índice 0.545 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 18 m\n- ponto_id 680015951 | AV. DO RIO PEQUENO , 69 | distrito RIO PEQUENO | posição 1249 | índice 0.539 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 17 m\n- ponto_id 680016591 | AV. DO RIO PEQUENO , 221 | distrito RIO PEQUENO | posição 1429 | índice 0.528 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 18 m\n- ponto_id 680010757 | R. ANA MARIA LELIS DA SILVA , 33 | distrito RIO PEQUENO | posição 1527 | índice 0.522 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 20 m\n- ponto_id 680010765 | AV. OTACÍLIO TOMANIK , 128 | distrito RIO PEQUENO | posição 1635 | índice 0.514 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 16 m",
+   "pontos": [
+    "680010757",
+    "680010765",
+    "680015951",
+    "680016591",
+    "680017123"
+   ]
+  },
+  "RAPOSO TAVARES": {
+   "fonte": "gold.ft_resumo_distrito#RAPOSO TAVARES",
+   "bloco": "Distrito RAPOSO TAVARES (subprefeitura BUTANTA): 255 pontos, índice médio 0.278, 13 na faixa alta, 121 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 660015827 | ROD. RAPOSO TAVARES , 0 | distrito RAPOSO TAVARES | posição 988 | índice 0.558 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 23 m\n- ponto_id 6607543 | R. ÂNGELO APARECIDO DOS SANTOS DIAS , 395 | distrito RAPOSO TAVARES | posição 1122 | índice 0.547 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 20 m\n- ponto_id 660010626 | AV. PROF. JOÃO DE LORENZO , 489 | distrito RAPOSO TAVARES | posição 1129 | índice 0.546 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 20 m\n- ponto_id 660010573 | R. GABRIEL DE CARVALHO , 201 | distrito RAPOSO TAVARES | posição 1150 | índice 0.545 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 20 m\n- ponto_id 660015833 | ROD. RAPOSO TAVARES , 8015 | distrito RAPOSO TAVARES | posição 1156 | índice 0.544 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 78 m",
+   "pontos": [
+    "660010573",
+    "660010626",
+    "660015827",
+    "660015833",
+    "6607543"
+   ]
+  },
+  "ALTO DE PINHEIROS": {
+   "fonte": "gold.ft_resumo_distrito#ALTO DE PINHEIROS",
+   "bloco": "Distrito ALTO DE PINHEIROS (subprefeitura PINHEIROS): 117 pontos, índice médio 0.278, 7 na faixa alta, 100 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 211193 | R. DA. ELISA MORAES MENDES , 1280 | distrito ALTO DE PINHEIROS | posição 725 | índice 0.583 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 27 m\n- ponto_id 211241 | AV. DRA. RUTH CARDOSO , 4797 | distrito ALTO DE PINHEIROS | posição 727 | índice 0.583 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 27 m\n- ponto_id 211148 | AV. ARRUDA BOTELHO , 595 | distrito ALTO DE PINHEIROS | posição 1344 | índice 0.534 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 22 m\n- ponto_id 20014835 | AV. PEDROSO DE MORAES , 0 | distrito ALTO DE PINHEIROS | posição 1601 | índice 0.516 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 16 m\n- ponto_id 20014852 | AV. PROF. FONSECA RODRIGUES , 2116 | distrito ALTO DE PINHEIROS | posição 1667 | índice 0.512 | faixa alta | ocorrências noturnas a 150 m: 10 | poste mais próximo: 13 m",
+   "pontos": [
+    "20014835",
+    "20014852",
+    "211148",
+    "211193",
+    "211241"
+   ]
+  },
+  "MANDAQUI": {
+   "fonte": "gold.ft_resumo_distrito#MANDAQUI",
+   "bloco": "Distrito MANDAQUI (subprefeitura SANTANA-TUCURUVI): 201 pontos, índice médio 0.278, 11 na faixa alta, 133 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 510005068 | AV. IMIRIM , 2214 | distrito MANDAQUI | posição 268 | índice 0.669 | faixa alta | ocorrências noturnas a 150 m: 14 | poste mais próximo: 21 m\n- ponto_id 510001602 | AV. DIREITOS HUMANOS , 50 | distrito MANDAQUI | posição 577 | índice 0.603 | faixa alta | ocorrências noturnas a 150 m: 9 | poste mais próximo: 18 m\n- ponto_id 510001951 | AV. DR. FRANCISCO RANIERI , 202 | distrito MANDAQUI | posição 864 | índice 0.568 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 18 m\n- ponto_id 510001965 | AV. CONS. MOREIRA DE BARROS , 2516 | distrito MANDAQUI | posição 938 | índice 0.563 | faixa alta | ocorrências noturnas a 150 m: 7 | poste mais próximo: 17 m\n- ponto_id 510001529 | AV. PARADA PINTO , 2204 | distrito MANDAQUI | posição 1047 | índice 0.554 | faixa alta | ocorrências noturnas a 150 m: 13 | poste mais próximo: 14 m",
+   "pontos": [
+    "510001529",
+    "510001602",
+    "510001951",
+    "510001965",
+    "510005068"
+   ]
+  },
+  "JOSE BONIFACIO": {
+   "fonte": "gold.ft_resumo_distrito#JOSE BONIFACIO",
+   "bloco": "Distrito JOSE BONIFACIO (subprefeitura ITAQUERA): 274 pontos, índice médio 0.277, 17 na faixa alta, 173 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 460004925 | AV. JACU-PÊSSEGO/NOVA TRABALHADORES , 35 | distrito JOSE BONIFACIO | posição 385 | índice 0.639 | faixa alta | ocorrências noturnas a 150 m: 11 | poste mais próximo: 20 m\n- ponto_id 4607679 | ESTR. ITAQUERA-GUAIANASES , 2458 | distrito JOSE BONIFACIO | posição 933 | índice 0.563 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 26 m\n- ponto_id 7612195 | AV. JACU-PÊSSEGO/NOVA TRABALHADORES , 0 | distrito JOSE BONIFACIO | posição 995 | índice 0.558 | faixa alta | ocorrências noturnas a 150 m: 10 | poste mais próximo: 15 m\n- ponto_id 580004915 | AV. JACU-PÊSSEGO/NOVA TRABALHADORES , 2891 | distrito JOSE BONIFACIO | posição 1051 | índice 0.554 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 22 m\n- ponto_id 460008336 | R. FELIPE LAURI , 90 | distrito JOSE BONIFACIO | posição 1107 | índice 0.548 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 20 m",
+   "pontos": [
+    "460004925",
+    "460008336",
+    "4607679",
+    "580004915",
+    "7612195"
+   ]
+  },
+  "JACANA": {
+   "fonte": "gold.ft_resumo_distrito#JACANA",
+   "bloco": "Distrito JACANA (subprefeitura JACANA-TREMEMBE): 209 pontos, índice médio 0.275, 13 na faixa alta, 141 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 380004306 | AV. LUÍS STAMATIS , 103 | distrito JACANA | posição 435 | índice 0.630 | faixa alta | ocorrências noturnas a 150 m: 12 | poste mais próximo: 18 m\n- ponto_id 380004053 | AV. GUAPIRA , 2674 | distrito JACANA | posição 753 | índice 0.580 | faixa alta | ocorrências noturnas a 150 m: 10 | poste mais próximo: 16 m\n- ponto_id 3812654 | R. ARI DA ROCHA MIRANDA , 0 | distrito JACANA | posição 870 | índice 0.568 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 20 m\n- ponto_id 380003927 | R. DR. CARLOS BASTOS ARANHA , 230 | distrito JACANA | posição 945 | índice 0.562 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 25 m\n- ponto_id 3812763 | R. MÁRIO LAGO , 3 | distrito JACANA | posição 1010 | índice 0.556 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 19 m",
+   "pontos": [
+    "380003927",
+    "380004053",
+    "380004306",
+    "3812654",
+    "3812763"
+   ]
+  },
+  "PEDREIRA": {
+   "fonte": "gold.ft_resumo_distrito#PEDREIRA",
+   "bloco": "Distrito PEDREIRA (subprefeitura CIDADE ADEMAR): 234 pontos, índice médio 0.275, 12 na faixa alta, 131 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 5914632 | PÇA. DO ACURI , 0 | distrito PEDREIRA | posição 783 | índice 0.575 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 19 m\n- ponto_id 5901712 | R. PONTES DE MORAES , 395 | distrito PEDREIRA | posição 1224 | índice 0.540 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 26 m\n- ponto_id 590007787 | ESTR. DO ALVARENGA , 403 | distrito PEDREIRA | posição 1266 | índice 0.537 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 24 m\n- ponto_id 590007914 | R. JOSÉ VIEIRA MARTINS , 101 | distrito PEDREIRA | posição 1376 | índice 0.531 | faixa alta | ocorrências noturnas a 150 m: 10 | poste mais próximo: 14 m\n- ponto_id 590013807 | ESTR. DO ALVARENGA , 2240 | distrito PEDREIRA | posição 1526 | índice 0.522 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 20 m",
+   "pontos": [
+    "590007787",
+    "590007914",
+    "590013807",
+    "5901712",
+    "5914632"
+   ]
+  },
+  "VILA FORMOSA": {
+   "fonte": "gold.ft_resumo_distrito#VILA FORMOSA",
+   "bloco": "Distrito VILA FORMOSA (subprefeitura ARICANDUVA-FORMOSA-CARRAO): 197 pontos, índice médio 0.274, 7 na faixa alta, 109 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 870008712 | AV. REG. FEIJÓ , 1739 | distrito VILA FORMOSA | posição 273 | índice 0.667 | faixa alta | ocorrências noturnas a 150 m: 12 | poste mais próximo: 32 m\n- ponto_id 870008835 | R. EMÍLIA MARENGO , 160 | distrito VILA FORMOSA | posição 774 | índice 0.576 | faixa alta | ocorrências noturnas a 150 m: 9 | poste mais próximo: 16 m\n- ponto_id 8709131 | AV. REG. FEIJÓ , 1462 | distrito VILA FORMOSA | posição 1102 | índice 0.548 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 20 m\n- ponto_id 870008649 | PÇA. DR. SAMPAIO VIDAL , 49 | distrito VILA FORMOSA | posição 1116 | índice 0.547 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 18 m\n- ponto_id 870012603 | AV. DR. EDUARDO COTCHING , 1892 | distrito VILA FORMOSA | posição 1189 | índice 0.542 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 20 m",
+   "pontos": [
+    "870008649",
+    "870008712",
+    "870008835",
+    "870012603",
+    "8709131"
+   ]
+  },
+  "SAPOPEMBA": {
+   "fonte": "gold.ft_resumo_distrito#SAPOPEMBA",
+   "bloco": "Distrito SAPOPEMBA (subprefeitura SAPOPEMBA): 374 pontos, índice médio 0.272, 13 na faixa alta, 259 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 7805133 | AV. DO ORATÓRIO , 6557 | distrito SAPOPEMBA | posição 1018 | índice 0.556 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 22 m\n- ponto_id 780006344 | R. ORESTE DAMOLIN , 9 | distrito SAPOPEMBA | posição 1130 | índice 0.546 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 20 m\n- ponto_id 8704829 | AV. SAPOPEMBA , 4180 | distrito SAPOPEMBA | posição 1387 | índice 0.531 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 17 m\n- ponto_id 780006265 | R. DR. FREDERICO MARTINS DA COSTA CARVALHO , 340 | distrito SAPOPEMBA | posição 1394 | índice 0.530 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 22 m\n- ponto_id 7805214 | AV. SAPOPEMBA , 9820 | distrito SAPOPEMBA | posição 1556 | índice 0.519 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 16 m",
+   "pontos": [
+    "780006265",
+    "780006344",
+    "7805133",
+    "7805214",
+    "8704829"
+   ]
+  },
+  "JARDIM HELENA": {
+   "fonte": "gold.ft_resumo_distrito#JARDIM HELENA",
+   "bloco": "Distrito JARDIM HELENA (subprefeitura SAO MIGUEL): 180 pontos, índice médio 0.272, 7 na faixa alta, 118 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 350006103 | R. RAFAEL CORREIA DA SILVA , 22 | distrito JARDIM HELENA | posição 997 | índice 0.557 | faixa alta | ocorrências noturnas a 150 m: 15 | poste mais próximo: 13 m\n- ponto_id 4312041 | AV. ESTRELA DA NOITE , 903 | distrito JARDIM HELENA | posição 1364 | índice 0.532 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 22 m\n- ponto_id 4312003 | R. KUMAKI AOKI , 933 | distrito JARDIM HELENA | posição 1428 | índice 0.528 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 18 m\n- ponto_id 430002934 | AV. OLIVEIRA FREIRE , 268 | distrito JARDIM HELENA | posição 1719 | índice 0.510 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 17 m\n- ponto_id 350006101 | R. RAFAEL CORREIA DA SILVA , 0 | distrito JARDIM HELENA | posição 1931 | índice 0.502 | faixa alta | ocorrências noturnas a 150 m: 9 | poste mais próximo: 13 m",
+   "pontos": [
+    "350006101",
+    "350006103",
+    "430002934",
+    "4312003",
+    "4312041"
+   ]
+  },
+  "SAO LUCAS": {
+   "fonte": "gold.ft_resumo_distrito#SAO LUCAS",
+   "bloco": "Distrito SAO LUCAS (subprefeitura VILA PRUDENTE): 267 pontos, índice médio 0.271, 6 na faixa alta, 128 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 740006636 | AV. ALBERTO RAMOS , 510 | distrito SAO LUCAS | posição 1123 | índice 0.547 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 20 m\n- ponto_id 740006648 | PÇA. GALIANO JACOMOSSI , 0 | distrito SAO LUCAS | posição 1360 | índice 0.532 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 18 m\n- ponto_id 7404463 | R. IELMO MARINHO , 897 | distrito SAO LUCAS | posição 1724 | índice 0.510 | faixa alta | ocorrências noturnas a 150 m: 2 | poste mais próximo: 27 m\n- ponto_id 740006407 | AV. DO ORATÓRIO , 541 | distrito SAO LUCAS | posição 1747 | índice 0.509 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 18 m\n- ponto_id 740006531 | R. SOLIDÔNIO LEITE , 1835 | distrito SAO LUCAS | posição 1959 | índice 0.501 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 18 m",
+   "pontos": [
+    "740006407",
+    "740006531",
+    "740006636",
+    "740006648",
+    "7404463"
+   ]
+  },
+  "VILA MATILDE": {
+   "fonte": "gold.ft_resumo_distrito#VILA MATILDE",
+   "bloco": "Distrito VILA MATILDE (subprefeitura PENHA): 264 pontos, índice médio 0.269, 17 na faixa alta, 165 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 930008446 | R. JOAQUIM MARRA , 899 | distrito VILA MATILDE | posição 672 | índice 0.589 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 21 m\n- ponto_id 9309384 | R. JOAQUIM MARRA , 1711 | distrito VILA MATILDE | posição 676 | índice 0.588 | faixa alta | ocorrências noturnas a 150 m: 9 | poste mais próximo: 17 m\n- ponto_id 9309314 | R. PORTO DA FOLHA , 20 | distrito VILA MATILDE | posição 830 | índice 0.571 | faixa alta | ocorrências noturnas a 150 m: 10 | poste mais próximo: 15 m\n- ponto_id 930012483 | AV. CDE. DE FRONTIN , 0 | distrito VILA MATILDE | posição 943 | índice 0.563 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 18 m\n- ponto_id 930008459 | R. PARANHOS , 333 | distrito VILA MATILDE | posição 1000 | índice 0.557 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 22 m",
+   "pontos": [
+    "930008446",
+    "930008459",
+    "930012483",
+    "9309314",
+    "9309384"
+   ]
+  },
+  "SAO RAFAEL": {
+   "fonte": "gold.ft_resumo_distrito#SAO RAFAEL",
+   "bloco": "Distrito SAO RAFAEL (subprefeitura SAO MATEUS): 219 pontos, índice médio 0.269, 10 na faixa alta, 117 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 770007688 | AV. SG. IRACITAN COIMBRA , 147 | distrito SAO RAFAEL | posição 958 | índice 0.561 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 18 m\n- ponto_id 770012128 | AV. SAPOPEMBA , 14700 | distrito SAO RAFAEL | posição 959 | índice 0.561 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 18 m\n- ponto_id 770007696 | R. PEDRO CORTE REAL , 265 | distrito SAO RAFAEL | posição 1178 | índice 0.543 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 20 m\n- ponto_id 770007637 | AV. DOS SERTANISTAS , 63 | distrito SAO RAFAEL | posição 1289 | índice 0.536 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 23 m\n- ponto_id 7704128 | R. JOSÉ RICARDO DA COSTA , 46 | distrito SAO RAFAEL | posição 1375 | índice 0.531 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 18 m",
+   "pontos": [
+    "770007637",
+    "770007688",
+    "770007696",
+    "770012128",
+    "7704128"
+   ]
+  },
+  "VILA PRUDENTE": {
+   "fonte": "gold.ft_resumo_distrito#VILA PRUDENTE",
+   "bloco": "Distrito VILA PRUDENTE (subprefeitura VILA PRUDENTE): 234 pontos, índice médio 0.269, 14 na faixa alta, 221 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 9505562 | R. IBITIRAMA , 183 | distrito VILA PRUDENTE | posição 250 | índice 0.673 | faixa alta | ocorrências noturnas a 150 m: 22 | poste mais próximo: 17 m\n- ponto_id 950014198 | R. DO ORFANATO , 825 | distrito VILA PRUDENTE | posição 759 | índice 0.579 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 20 m\n- ponto_id 9505657 | AV. PROF. LUIZ IGNÁCIO ANHAIA MELLO , 610 | distrito VILA PRUDENTE | posição 929 | índice 0.564 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 27 m\n- ponto_id 950014191 | R. DO ORFANATO , 45 | distrito VILA PRUDENTE | posição 991 | índice 0.558 | faixa alta | ocorrências noturnas a 150 m: 11 | poste mais próximo: 14 m\n- ponto_id 950014189 | R. IBITIRAMA , 11 | distrito VILA PRUDENTE | posição 1082 | índice 0.551 | faixa alta | ocorrências noturnas a 150 m: 16 | poste mais próximo: 13 m",
+   "pontos": [
+    "950014189",
+    "950014191",
+    "950014198",
+    "9505562",
+    "9505657"
+   ]
+  },
+  "ARICANDUVA": {
+   "fonte": "gold.ft_resumo_distrito#ARICANDUVA",
+   "bloco": "Distrito ARICANDUVA (subprefeitura ARICANDUVA-FORMOSA-CARRAO): 162 pontos, índice médio 0.268, 7 na faixa alta, 108 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 7805246 | AV. DA BARREIRA GRANDE , 1537 | distrito ARICANDUVA | posição 894 | índice 0.566 | faixa alta | ocorrências noturnas a 150 m: 9 | poste mais próximo: 16 m\n- ponto_id 40012308 | AV. RIO DAS PEDRAS , 1023 | distrito ARICANDUVA | posição 1363 | índice 0.532 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 22 m\n- ponto_id 780005491 | AV. DA BARREIRA GRANDE , 3029 | distrito ARICANDUVA | posição 1537 | índice 0.521 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 20 m\n- ponto_id 40008541 | AV. DOS LATINOS , 66 | distrito ARICANDUVA | posição 1580 | índice 0.518 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 19 m\n- ponto_id 40012309 | AV. RIO DAS PEDRAS , 552 | distrito ARICANDUVA | posição 1835 | índice 0.506 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 18 m",
+   "pontos": [
+    "40008541",
+    "40012308",
+    "40012309",
+    "780005491",
+    "7805246"
+   ]
+  },
+  "JARDIM ANGELA": {
+   "fonte": "gold.ft_resumo_distrito#JARDIM ANGELA",
+   "bloco": "Distrito JARDIM ANGELA (subprefeitura M BOI MIRIM): 441 pontos, índice médio 0.262, 20 na faixa alta, 360 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 4203618 | ESTR. DO M BOI MIRIM , 5181 | distrito JARDIM ANGELA | posição 581 | índice 0.603 | faixa alta | ocorrências noturnas a 150 m: 11 | poste mais próximo: 17 m\n- ponto_id 4203724 | ÁREA DE APOIO DO TERM. JD. ÂNGELA , 5700 | distrito JARDIM ANGELA | posição 594 | índice 0.602 | faixa alta | ocorrências noturnas a 150 m: 14 | poste mais próximo: 15 m\n- ponto_id 4203935 | ESTR. DO EMBU-GUAÇU , 9861 | distrito JARDIM ANGELA | posição 708 | índice 0.585 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 20 m\n- ponto_id 4203782 | ESTR. DO M BOI MIRIM , 5860 | distrito JARDIM ANGELA | posição 914 | índice 0.565 | faixa alta | ocorrências noturnas a 150 m: 11 | poste mais próximo: 15 m\n- ponto_id 420013663 | ESTR. DO M BOI MIRIM , 5787 | distrito JARDIM ANGELA | posição 1096 | índice 0.549 | faixa alta | ocorrências noturnas a 150 m: 10 | poste mais próximo: 14 m",
+   "pontos": [
+    "420013663",
+    "4203618",
+    "4203724",
+    "4203782",
+    "4203935"
+   ]
+  },
+  "JARAGUA": {
+   "fonte": "gold.ft_resumo_distrito#JARAGUA",
+   "bloco": "Distrito JARAGUA (subprefeitura PIRITUBA-JARAGUA): 445 pontos, índice médio 0.261, 17 na faixa alta, 226 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 4114584 | AV. RAIMUNDO PEREIRA DE MAGALHÃES , 12011 | distrito JARAGUA | posição 921 | índice 0.564 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 20 m\n- ponto_id 410003643 | R. JACINTHO PEREIRA , 97 | distrito JARAGUA | posição 937 | índice 0.563 | faixa alta | ocorrências noturnas a 150 m: 7 | poste mais próximo: 17 m\n- ponto_id 410003647 | ESTR. DO CORREDOR , 1141 | distrito JARAGUA | posição 1262 | índice 0.537 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 24 m\n- ponto_id 410003591 | AV. RAIMUNDO PEREIRA DE MAGALHÃES , 11747 | distrito JARAGUA | posição 1315 | índice 0.535 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 23 m\n- ponto_id 410003657 | R. PAULO ARENTINO , 0 | distrito JARAGUA | posição 1367 | índice 0.532 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 22 m",
+   "pontos": [
+    "410003591",
+    "410003643",
+    "410003647",
+    "410003657",
+    "4114584"
+   ]
+  },
+  "CIDADE LIDER": {
+   "fonte": "gold.ft_resumo_distrito#CIDADE LIDER",
+   "bloco": "Distrito CIDADE LIDER (subprefeitura ITAQUERA): 275 pontos, índice médio 0.260, 9 na faixa alta, 156 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 2409169 | R. SERRA DAS DIVISÕES , 117 | distrito CIDADE LIDER | posição 1382 | índice 0.531 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 17 m\n- ponto_id 2409168 | R. SERRA DAS DIVISÕES , 100 | distrito CIDADE LIDER | posição 1550 | índice 0.519 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 16 m\n- ponto_id 2409201 | AV. ITAQUERA , 6751 | distrito CIDADE LIDER | posição 1670 | índice 0.512 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 15 m\n- ponto_id 240008525 | R. SAUL BORGES CARNEIRO , 16 | distrito CIDADE LIDER | posição 1734 | índice 0.510 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 18 m\n- ponto_id 2409263 | R. JOÃO CHAGAS , 367 | distrito CIDADE LIDER | posição 1756 | índice 0.508 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 17 m",
+   "pontos": [
+    "240008525",
+    "2409168",
+    "2409169",
+    "2409201",
+    "2409263"
+   ]
+  },
+  "CANGAIBA": {
+   "fonte": "gold.ft_resumo_distrito#CANGAIBA",
+   "bloco": "Distrito CANGAIBA (subprefeitura PENHA): 271 pontos, índice médio 0.256, 4 na faixa alta, 156 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 1809554 | AV. GOV. CARVALHO PINTO , 1171 | distrito CANGAIBA | posição 1271 | índice 0.537 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 19 m\n- ponto_id 180005300 | AV. ALFREDO RIBEIRO DE CASTRO , 300 | distrito CANGAIBA | posição 1332 | índice 0.534 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 23 m\n- ponto_id 180005267 | AV. CANGAIBA , 3423 | distrito CANGAIBA | posição 1588 | índice 0.517 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 19 m\n- ponto_id 1814702 | R. LONDRES , 216 | distrito CANGAIBA | posição 1878 | índice 0.504 | faixa alta | ocorrências noturnas a 150 m: 2 | poste mais próximo: 23 m\n- ponto_id 1814571 | R. ENTRE RIOS , 680 | distrito CANGAIBA | posição 2485 | índice 0.480 | faixa media | ocorrências noturnas a 150 m: 3 | poste mais próximo: 16 m",
+   "pontos": [
+    "180005267",
+    "180005300",
+    "1809554",
+    "1814571",
+    "1814702"
+   ]
+  },
+  "ANHANGUERA": {
+   "fonte": "gold.ft_resumo_distrito#ANHANGUERA",
+   "bloco": "Distrito ANHANGUERA (subprefeitura PERUS): 192 pontos, índice médio 0.256, 2 na faixa alta, 86 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 30003035 | ROD. ANHANGUERA , 0 | distrito ANHANGUERA | posição 699 | índice 0.586 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 33 m\n- ponto_id 30003293 | R. DIEGO VELASQUEZ , 125 | distrito ANHANGUERA | posição 1323 | índice 0.534 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 17 m\n- ponto_id 301747 | ROD. ANHANGUERA , 0 | distrito ANHANGUERA | posição 2397 | índice 0.484 | faixa media | ocorrências noturnas a 150 m: 2 | poste mais próximo: 19 m\n- ponto_id 30003052 | ROD. ANHANGUERA (PISTA LOCAL) , 0 | distrito ANHANGUERA | posição 2730 | índice 0.471 | faixa media | ocorrências noturnas a 150 m: 1 | poste mais próximo: 59 m\n- ponto_id 301748 | ROD. ANHANGUERA , 0 | distrito ANHANGUERA | posição 2765 | índice 0.470 | faixa media | ocorrências noturnas a 150 m: 1 | poste mais próximo: 42 m",
+   "pontos": [
+    "30003035",
+    "30003052",
+    "30003293",
+    "301747",
+    "301748"
+   ]
+  },
+  "SAO DOMINGOS": {
+   "fonte": "gold.ft_resumo_distrito#SAO DOMINGOS",
+   "bloco": "Distrito SAO DOMINGOS (subprefeitura PIRITUBA-JARAGUA): 189 pontos, índice médio 0.254, 7 na faixa alta, 132 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 730017255 | R. LUÍS GONÇALVES BASTOS , 54 | distrito SAO DOMINGOS | posição 817 | índice 0.571 | faixa alta | ocorrências noturnas a 150 m: 9 | poste mais próximo: 16 m\n- ponto_id 730000096 | AV. JORN. PAULO ZING , 964 | distrito SAO DOMINGOS | posição 1352 | índice 0.533 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 22 m\n- ponto_id 7313928 | R. DOS RADIALISTAS , 80 | distrito SAO DOMINGOS | posição 1454 | índice 0.526 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 18 m\n- ponto_id 730000083 | ESTR. TURÍSTICA DO JARAGUÁ , 790 | distrito SAO DOMINGOS | posição 1721 | índice 0.510 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 17 m\n- ponto_id 7313943 | AV. JORN. PAULO ZING , 929 | distrito SAO DOMINGOS | posição 1791 | índice 0.508 | faixa alta | ocorrências noturnas a 150 m: 2 | poste mais próximo: 25 m",
+   "pontos": [
+    "730000083",
+    "730000096",
+    "730017255",
+    "7313928",
+    "7313943"
+   ]
+  },
+  "TREMEMBE": {
+   "fonte": "gold.ft_resumo_distrito#TREMEMBE",
+   "bloco": "Distrito TREMEMBE (subprefeitura JACANA-TREMEMBE): 395 pontos, índice médio 0.251, 19 na faixa alta, 236 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 8313682 | R. VINTE DE MARÇO , 11 | distrito TREMEMBE | posição 657 | índice 0.591 | faixa alta | ocorrências noturnas a 150 m: 15 | poste mais próximo: 14 m\n- ponto_id 8313607 | R. LUÍS DE OLIVEIRA BULHÕES , 65 | distrito TREMEMBE | posição 776 | índice 0.576 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 19 m\n- ponto_id 8313547 | AV. CEL. SEZEFREDO FAGUNDES , 4775 | distrito TREMEMBE | posição 847 | índice 0.569 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 21 m\n- ponto_id 8313648 | R. AUGUSTO RODRIGUES , 124 | distrito TREMEMBE | posição 903 | índice 0.566 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 20 m\n- ponto_id 8313609 | R. JOÃO RIOS , 410 | distrito TREMEMBE | posição 923 | índice 0.564 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 20 m",
+   "pontos": [
+    "8313547",
+    "8313607",
+    "8313609",
+    "8313648",
+    "8313682"
+   ]
+  },
+  "PONTE RASA": {
+   "fonte": "gold.ft_resumo_distrito#PONTE RASA",
+   "bloco": "Distrito PONTE RASA (subprefeitura ERMELINO MATARAZZO): 216 pontos, índice médio 0.250, 5 na faixa alta, 83 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 650005647 | AV. S. MIGUEL , 3391 | distrito PONTE RASA | posição 1393 | índice 0.530 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 22 m\n- ponto_id 650005387 | R. CEL. PAULO MARIANO , 0 | distrito PONTE RASA | posição 1457 | índice 0.526 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 16 m\n- ponto_id 650005665 | AV. S. MIGUEL , 1498 | distrito PONTE RASA | posição 1815 | índice 0.507 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 18 m\n- ponto_id 650004843 | AV. ÁGUIA DE HAIA , 3399 | distrito PONTE RASA | posição 1933 | índice 0.502 | faixa alta | ocorrências noturnas a 150 m: 9 | poste mais próximo: 13 m\n- ponto_id 6508818 | R. EVARISTO EMILIANO BUENO , 37 | distrito PONTE RASA | posição 2038 | índice 0.498 | faixa alta | ocorrências noturnas a 150 m: 2 | poste mais próximo: 21 m",
+   "pontos": [
+    "650004843",
+    "650005387",
+    "650005647",
+    "650005665",
+    "6508818"
+   ]
+  },
+  "GRAJAU": {
+   "fonte": "gold.ft_resumo_distrito#GRAJAU",
+   "bloco": "Distrito GRAJAU (subprefeitura CAPELA DO SOCORRO): 586 pontos, índice médio 0.249, 19 na faixa alta, 528 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 2314625 | AV. MARGINAL LESTE - ESTAÇÃO MENDES - VILA NATAL , 0 | distrito GRAJAU | posição 138 | índice 0.722 | faixa alta | ocorrências noturnas a 150 m: 22 | poste mais próximo: 24 m\n- ponto_id 300009528 | AV. DA. BELMIRA MARIN , 3601 | distrito GRAJAU | posição 330 | índice 0.650 | faixa alta | ocorrências noturnas a 150 m: 14 | poste mais próximo: 19 m\n- ponto_id 3014796 | AV. GRANDE SÃO PAULO , 85 | distrito GRAJAU | posição 396 | índice 0.637 | faixa alta | ocorrências noturnas a 150 m: 52 | poste mais próximo: 12 m\n- ponto_id 300009889 | AV. DA. BELMIRA MARIN , 773 | distrito GRAJAU | posição 536 | índice 0.610 | faixa alta | ocorrências noturnas a 150 m: 24 | poste mais próximo: 13 m\n- ponto_id 300009895 | AV. DA. BELMIRA MARIN , 2143 | distrito GRAJAU | posição 673 | índice 0.589 | faixa alta | ocorrências noturnas a 150 m: 7 | poste mais próximo: 19 m",
+   "pontos": [
+    "2314625",
+    "300009528",
+    "300009889",
+    "300009895",
+    "3014796"
+   ]
+  },
+  "PARQUE DO CARMO": {
+   "fonte": "gold.ft_resumo_distrito#PARQUE DO CARMO",
+   "bloco": "Distrito PARQUE DO CARMO (subprefeitura ITAQUERA): 198 pontos, índice médio 0.247, 2 na faixa alta, 123 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 2009230 | AV. ARICANDUVA , 8623 | distrito PARQUE DO CARMO | posição 360 | índice 0.643 | faixa alta | ocorrências noturnas a 150 m: 10 | poste mais próximo: 24 m\n- ponto_id 580012332 | R. HARRY DANNENBERG , 107 | distrito PARQUE DO CARMO | posição 859 | índice 0.568 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 20 m\n- ponto_id 580007233 | AV. MARIA LUIZA AMERICANO , 567 | distrito PARQUE DO CARMO | posição 2167 | índice 0.493 | faixa media | ocorrências noturnas a 150 m: 4 | poste mais próximo: 16 m\n- ponto_id 5804230 | AV. MARIA LUIZA AMERICANO , 99 | distrito PARQUE DO CARMO | posição 2236 | índice 0.490 | faixa media | ocorrências noturnas a 150 m: 2 | poste mais próximo: 20 m\n- ponto_id 580012331 | R. HARRY DANNENBERG , 491 | distrito PARQUE DO CARMO | posição 2243 | índice 0.490 | faixa media | ocorrências noturnas a 150 m: 3 | poste mais próximo: 17 m",
+   "pontos": [
+    "2009230",
+    "580007233",
+    "580012331",
+    "580012332",
+    "5804230"
+   ]
+  },
+  "IGUATEMI": {
+   "fonte": "gold.ft_resumo_distrito#IGUATEMI",
+   "bloco": "Distrito IGUATEMI (subprefeitura SAO MATEUS): 237 pontos, índice médio 0.244, 5 na faixa alta, 143 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 3214724 | R. RECANTO DO SOL , 75 | distrito IGUATEMI | posição 1143 | índice 0.545 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 18 m\n- ponto_id 320007578 | R. FRANCISCO DE MELO PALHETA , 1194 | distrito IGUATEMI | posição 1465 | índice 0.525 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 20 m\n- ponto_id 3214729 | AV. RAGUEB CHOHFI , 3693 | distrito IGUATEMI | posição 1867 | índice 0.505 | faixa alta | ocorrências noturnas a 150 m: 2 | poste mais próximo: 23 m\n- ponto_id 3214690 | AV. RAGUEB CHOHFI , 6336 | distrito IGUATEMI | posição 1910 | índice 0.503 | faixa alta | ocorrências noturnas a 150 m: 2 | poste mais próximo: 22 m\n- ponto_id 3214510 | R. RECANTO DO SOL , 32 | distrito IGUATEMI | posição 1993 | índice 0.500 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 18 m",
+   "pontos": [
+    "320007578",
+    "3214510",
+    "3214690",
+    "3214724",
+    "3214729"
+   ]
+  },
+  "PERUS": {
+   "fonte": "gold.ft_resumo_distrito#PERUS",
+   "bloco": "Distrito PERUS (subprefeitura PERUS): 229 pontos, índice médio 0.243, 5 na faixa alta, 224 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 620003112 | AV. RAIMUNDO PEREIRA DE MAGALHÃES , 16380 | distrito PERUS | posição 356 | índice 0.644 | faixa alta | ocorrências noturnas a 150 m: 10 | poste mais próximo: 24 m\n- ponto_id 6201744 | AV. RAIMUNDO PEREIRA DE MAGALHÃES , 16490 | distrito PERUS | posição 572 | índice 0.604 | faixa alta | ocorrências noturnas a 150 m: 10 | poste mais próximo: 17 m\n- ponto_id 6201771 | R. CRISPIM DO AMARAL , 53 | distrito PERUS | posição 628 | índice 0.596 | faixa alta | ocorrências noturnas a 150 m: 6 | poste mais próximo: 24 m\n- ponto_id 6201768 | AV. FIORELLI PECCICACCO , 1800 | distrito PERUS | posição 1164 | índice 0.544 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 18 m\n- ponto_id 6201775 | R. VIOLETA SILVESTRE , 0 | distrito PERUS | posição 1919 | índice 0.503 | faixa alta | ocorrências noturnas a 150 m: 5 | poste mais próximo: 15 m",
+   "pontos": [
+    "620003112",
+    "6201744",
+    "6201768",
+    "6201771",
+    "6201775"
+   ]
+  },
+  "PARELHEIROS": {
+   "fonte": "gold.ft_resumo_distrito#PARELHEIROS",
+   "bloco": "Distrito PARELHEIROS (subprefeitura PARELHEIROS): 391 pontos, índice médio 0.222, 3 na faixa alta, 155 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 560009225 | R. DUARTE ANTÔNIO MOURÃO , 249 | distrito PARELHEIROS | posição 1201 | índice 0.541 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 29 m\n- ponto_id 560009195 | ESTR. ECOTURÍSTICA DE PARELHEIROS , 4540 | distrito PARELHEIROS | posição 1979 | índice 0.500 | faixa alta | ocorrências noturnas a 150 m: 4 | poste mais próximo: 16 m\n- ponto_id 5614791 | ESTR. ECOTURÍSTICA DE PARELHEIROS , 1762 | distrito PARELHEIROS | posição 2097 | índice 0.496 | faixa alta | ocorrências noturnas a 150 m: 3 | poste mais próximo: 17 m\n- ponto_id 560009236 | AV. PAULO GUILGUER REIMBERG , 5 | distrito PARELHEIROS | posição 2823 | índice 0.469 | faixa media | ocorrências noturnas a 150 m: 24 | poste mais próximo: 8 m\n- ponto_id 560009211 | R. CARLOS JORGE SCHMIDT , 306 | distrito PARELHEIROS | posição 3059 | índice 0.462 | faixa media | ocorrências noturnas a 150 m: 3 | poste mais próximo: 15 m",
+   "pontos": [
+    "560009195",
+    "560009211",
+    "560009225",
+    "560009236",
+    "5614791"
+   ]
+  },
+  "MARSILAC": {
+   "fonte": "gold.ft_resumo_distrito#MARSILAC",
+   "bloco": "Distrito MARSILAC (subprefeitura PARELHEIROS): 51 pontos, índice médio 0.155, 0 na faixa alta, 2 ocorrências noturnas.\nOs 5 pontos mais vulneráveis do distrito:\n- ponto_id 560008922 | ESTR. S/N , 0 | distrito MARSILAC | posição 5507 | índice 0.398 | faixa media | ocorrências noturnas a 150 m: 0 | poste mais próximo: 65 m\n- ponto_id 520008896 | ESTR. ENG. MARSILAC , 8153 | distrito MARSILAC | posição 5937 | índice 0.391 | faixa media | ocorrências noturnas a 150 m: 0 | poste mais próximo: 24 m\n- ponto_id 520008876 | ESTR. ENG. MARSILAC , 9675 | distrito MARSILAC | posição 7689 | índice 0.358 | faixa media | ocorrências noturnas a 150 m: 0 | poste mais próximo: 18 m\n- ponto_id 520008864 | R. BENEDITO SCHUNCK , 1497 | distrito MARSILAC | posição 7937 | índice 0.354 | faixa media | ocorrências noturnas a 150 m: 0 | poste mais próximo: 18 m\n- ponto_id 520008869 | R. BENEDITO SCHUNCK , 0 | distrito MARSILAC | posição 7938 | índice 0.354 | faixa media | ocorrências noturnas a 150 m: 0 | poste mais próximo: 18 m",
+   "pontos": [
+    "520008864",
+    "520008869",
+    "520008876",
+    "520008896",
+    "560008922"
+   ]
+  }
+ },
+ "saude": {
+  "dados_gold": true,
+  "ultima_execucao": {
+   "fim": "2026-11-18T17:21:02.873290-03:00",
+   "status": "ok"
+  }
+ }
+}

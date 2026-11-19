@@ -19,7 +19,7 @@ import mistune
 RAIZ = Path(__file__).resolve().parents[1]
 README = RAIZ / "pipeline" / "README.md"
 SAIDA = RAIZ / "docs" / "bigdata" / "UrbanCare-BigData.pdf"
-REPO = "https://github.com/rafadagalera/urbancare"
+REPO = "https://github.com/rafadagalera/urbanflow"
 
 EQUIPE = [
     ("Beatriz Silva Pinheiro Rocha", "RM553455"),
@@ -84,7 +84,7 @@ def ajustar_caminhos(html: str) -> str:
 
     def link(m):
         alvo = (base / m.group(2)).resolve().relative_to(RAIZ).as_posix()
-        return f'{m.group(1)}="{REPO}/blob/main/{alvo}"'
+        return f'{m.group(1)}="{REPO}/blob/master/{alvo}"'
 
     html = re.sub(r'(src)="(?!https?:|file:)([^"]+)"', img, html)
     return re.sub(r'(href)="(?!https?:|#|mailto:)([^"]+)"', link, html)
