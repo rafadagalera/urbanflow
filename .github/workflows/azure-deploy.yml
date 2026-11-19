@@ -1,4 +1,4 @@
-name: Deploy UrbanFlow to Azure App Service (CitizenTech no Ar)
+name: Deploy UrbanCare to Azure App Service (CitizenTech no Ar)
 
 on:
   push:
@@ -22,23 +22,20 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: apps/web/package-lock.json
 
-      - name: '3. Instalar Dependências e Compilar Frontend (TypeScript + Vite Build)'
-        working-directory: apps/web
-        run: |
-          npm ci --no-audit --no-fund
-          npm run build
+      - name: '3. Testar o Servidor do Chat (node --test)'
+        working-directory: web
+        run: node --test test/
 
-      - name: '4. Preparar Artefato de Produção (SPA + API Embarcada)'
+      - name: '4. Preparar Artefato de Produção (Landing UrbanCare + Chat)'
         run: |
           mkdir -p deploy_dist
-          cp -r apps/web/dist deploy_dist/dist
-          cp apps/web/server.mjs deploy_dist/server.mjs
+          cp -r web/public deploy_dist/dist
+          cp web/server.mjs web/contexto.json deploy_dist/
+          cp assistente/prompts/sistema.md deploy_dist/sistema.md
           cat << 'EOF' > deploy_dist/package.json
           {
-            "name": "urbanflow-azure-production",
+            "name": "urbancare-azure-production",
             "version": "1.0.0",
             "private": true,
             "type": "module",
