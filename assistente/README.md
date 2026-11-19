@@ -19,7 +19,7 @@ O assistente responde às duas coisas com base em um contexto fechado: o manual 
 ## 2. Arquitetura
 
 ```mermaid
-flowchart LR
+flowchart TD
     P[Pergunta do usuário<br/>até 500 caracteres] --> API[FastAPI<br/>POST /perguntar]
     API --> V1{Entrada válida?}
     V1 -- não --> E422[HTTP 422]
@@ -348,3 +348,14 @@ Sem argumentos, usa os 3 modelos da tabela da seção 3. Nenhum cabeçalho HTTP 
 - **Injeção de prompt.** A pergunta é tratada como dado (delimitada, sanitizada e declarada como dado no prompt), a saída é restrita a um esquema fechado e o assistente não tem ferramentas nem acesso de escrita, então o pior caso é uma resposta ruim, não uma ação. A defesa não é absoluta: a robustez foi testada em um caso real, não em um conjunto adversarial.
 - **Custo.** Cerca de US$ 0,0006 a 0,0012 por pergunta nos modelos testados, com contexto de 5 a 8 mil tokens de entrada. O reserva só é chamado em falha. No serviço publicado, a chave do OpenRouter é uma App Setting e deve ser uma chave dedicada, com limite de crédito baixo, para que um abuso não vire custo ilimitado.
 - **Transparência.** A resposta lista as `fontes` usadas e o selo de `confianca`; leituras simuladas são sinalizadas como tais.
+
+
+## Equipe (4ESPS)
+
+| Integrante | RM |
+| :--- | :--- |
+| Beatriz Silva Pinheiro Rocha | 553455 |
+| Enzzo Monteiro Barros Silva | 552616 |
+| Iago Diniz Fontes | 553776 |
+| Larissa Estella Gonçalves dos Santos | 552695 |
+| Rafael Alves do Nascimento | 553117 |

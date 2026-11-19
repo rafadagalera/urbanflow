@@ -31,8 +31,10 @@ UrbanCare é um abrigo de ônibus inteligente para quem espera o ônibus à noit
 
 | Disciplina | Documentação | Evidências |
 | :--- | :--- | :--- |
-| **Big Data Architecture & Data Integration** | [`pipeline/README.md`](pipeline/README.md) e [PDF da entrega](docs/bigdata/UrbanCare-BigData.pdf) | [prints do Airflow, consultas ao gold e notas dos dados](docs/bigdata/) |
-| **Generative AI for Engineering** | [`assistente/README.md`](assistente/README.md) | [saídas reais de 3 modelos, pytest](docs/evidencias/README.md) |
+| **Big Data Architecture & Data Integration** | [`pipeline/README.md`](pipeline/README.md) e [PDF da entrega](entregas/big-data/UrbanCare-BigData.pdf) | [prints do Airflow, consultas ao gold e notas dos dados](docs/bigdata/) |
+| **Generative AI for Engineering** | [`assistente/README.md`](assistente/README.md) e [PDF da entrega](entregas/genai/UrbanCare-GenAI.pdf) | [saídas reais de 3 modelos, pytest](docs/evidencias/README.md) |
+
+Os PDFs para o portal ficam em [`entregas/`](entregas/), uma pasta por disciplina, e são gerados dos READMEs por `python3 scripts/gerar_pdfs.py`.
 
 O pipeline alimenta o assistente: a cada pergunta, o assistente lê o resumo do schema `gold` no Postgres.
 
@@ -57,9 +59,10 @@ O pipeline alimenta o assistente: a cada pergunta, o assistente lê o resumo do 
 ├── docs/
 │   ├── manual.md               manual do produto (contexto do assistente)
 │   ├── specs/                  especificações de projeto
-│   ├── bigdata/                diagrama, prints, notas dos dados, consultas e PDF
+│   ├── bigdata/                diagrama, prints, notas dos dados e consultas
 │   └── evidencias/             saídas do assistente em 3 modelos e saídas do pytest
-├── scripts/                    gerar_evidencias.py, gerar_pdf_bigdata.py, exportar_contexto.py
+├── entregas/                   PDFs para o portal: big-data/ e genai/
+├── scripts/                    gerar_evidencias.py, gerar_pdfs.py, exportar_contexto.py, redteam.py
 └── data/                       bronze e silver gerados pelo pipeline (fora do git)
 ```
 

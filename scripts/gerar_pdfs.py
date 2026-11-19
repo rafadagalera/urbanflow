@@ -1,9 +1,14 @@
-"""Gera o PDF da entrega de Big Data a partir de pipeline/README.md.
+"""Gera os PDFs das entregas a partir dos READMEs de cada disciplina.
 
 Uma única fonte: o README do GitHub e o PDF do portal têm o mesmo conteúdo.
-Requer `mistune` (pip install mistune) e Google Chrome ou Chromium no PATH.
+- Big Data: pipeline/README.md  → entregas/big-data/UrbanCare-BigData.pdf
+- GenAI:    assistente/README.md → entregas/genai/UrbanCare-GenAI.pdf
 
-    python3 scripts/gerar_pdf_bigdata.py
+Requer `mistune` (pip install mistune) e Google Chrome ou Chromium no PATH.
+Diagramas Mermaid são desenhados pelo Chrome com o mermaid.js da jsDelivr (precisa de rede).
+
+    python3 scripts/gerar_pdfs.py            # os dois
+    python3 scripts/gerar_pdfs.py genai      # só um
 """
 from __future__ import annotations
 
@@ -17,8 +22,27 @@ from pathlib import Path
 import mistune
 
 RAIZ = Path(__file__).resolve().parents[1]
-README = RAIZ / "pipeline" / "README.md"
-SAIDA = RAIZ / "docs" / "bigdata" / "UrbanCare-BigData.pdf"
+MERMAID_JS = "https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"
+
+ENTREGAS = {
+    "bigdata": dict(
+        readme=RAIZ / "pipeline" / "README.md",
+        saida=RAIZ / "entregas" / "big-data" / "UrbanCare-BigData.pdf",
+        titulo="UrbanCare<br>Pipeline de dados",
+        disciplina="Big Data Architecture &amp; Data Integration<br>Profa. Ana Machado",
+        resumo="Arquitetura, dicionário de dados, justificativa dos parâmetros, evidências e limitações.",
+        pasta="pipeline/",
+    ),
+    "genai": dict(
+        readme=RAIZ / "assistente" / "README.md",
+        saida=RAIZ / "entregas" / "genai" / "UrbanCare-GenAI.pdf",
+        titulo="UrbanCare<br>Assistente do painel",
+        disciplina="Generative AI for Engineering<br>Prof. Reinaldo",
+        resumo="Problema, arquitetura, escolha do modelo, engenharia de prompts, exemplos reais, "
+               "tratamento de falhas, limitações e aspectos éticos.",
+        pasta="assistente/",
+    ),
+}
 REPO = "https://github.com/rafadagalera/urbanflow"
 
 EQUIPE = [
@@ -55,29 +79,30 @@ a { color: #0b57d0; text-decoration: none; }
 .capa .sub { font-size: 14pt; color: #424a53; margin: 8pt 0 0; }
 .capa table { width: auto; font-size: 10pt; }
 .capa td { border: none; padding: 1.5pt 14pt 1.5pt 0; }
+.mermaid { background: none; border: none; text-align: center; break-inside: avoid; }
+.mermaid svg { max-width: 100% !important; max-height: 200mm; width: auto; height: auto; }
 .capa .faixa { height: 6px; background: linear-gradient(90deg, #a5672e, #6e7781, #9a7d0a); margin: 14pt 0; }
 """
 
 
-def capa() -> str:
+def capa(e: dict) -> str:
     linhas = "".join(f"<tr><td>{n}</td><td>{rm}</td></tr>" for n, rm in EQUIPE)
     return f"""
 <section class="capa">
   <div class="topo">FIAP · Engenharia de Software · 4º ano<br>Global Solution CitizenTech · 2º semestre de 2026</div>
   <div>
-    <p class="titulo">UrbanCare<br>Pipeline de dados</p>
-    <p class="sub">Big Data Architecture &amp; Data Integration<br>Profa. Ana Machado</p>
+    <p class="titulo">{e["titulo"]}</p>
+    <p class="sub">{e["disciplina"]}</p>
     <div class="faixa"></div>
-    <p>Arquitetura, dicionário de dados, justificativa dos parâmetros, evidências e limitações.<br>
-    Repositório: <a href="{REPO}">{REPO}</a> (pasta <code>pipeline/</code>)</p>
+    <p>{e["resumo"]}<br>
+    Repositório: <a href="{REPO}">{REPO}</a> (pasta <code>{e["pasta"]}</code>)</p>
   </div>
   <div><strong>Equipe</strong><table>{linhas}</table><p style="margin-top:10pt">Novembro de 2026</p></div>
 </section>"""
 
 
-def ajustar_caminhos(html: str) -> str:
+def ajustar_caminhos(html: str, base: Path) -> str:
     """Imagens viram file:// absoluto; demais links relativos apontam para o GitHub."""
-    base = README.parent
 
     def img(m):
         return f'{m.group(1)}="{(base / m.group(2)).resolve().as_uri()}"'
@@ -97,19 +122,41 @@ def chrome() -> str:
     sys.exit("Chrome/Chromium não encontrado no PATH")
 
 
-def main():
-    md = README.read_text(encoding="utf-8")
+def mermaid(html: str) -> tuple[str, str]:
+    """Blocos ```mermaid viram <pre class="mermaid">; devolve o HTML e o script (vazio se não houver)."""
+    html, n = re.subn(r'<pre><code class="language-mermaid">(.*?)</code></pre>',
+                      r'<pre class="mermaid">\1</pre>', html, flags=re.S)
+    if not n:
+        return html, ""
+    return html, (f'<script src="{MERMAID_JS}"></script>'
+                  '<script>mermaid.initialize({startOnLoad: true, theme: "neutral", securityLevel: "loose"});</script>')
+
+
+def gerar(nome: str) -> None:
+    e = ENTREGAS[nome]
+    md = e["readme"].read_text(encoding="utf-8")
     corpo = mistune.create_markdown(plugins=["table"], escape=False)(md)
+    corpo, script = mermaid(ajustar_caminhos(corpo, e["readme"].parent))
     html = f"""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
-<title>UrbanCare: pipeline de dados</title><style>{CSS}</style></head>
-<body>{capa()}{ajustar_caminhos(corpo)}</body></html>"""
+<title>UrbanCare</title><style>{CSS}</style></head>
+<body>{capa(e)}{corpo}{script}</body></html>"""
+    e["saida"].parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory() as tmp:
         pagina = Path(tmp) / "relatorio.html"
         pagina.write_text(html, encoding="utf-8")
         subprocess.run([chrome(), "--headless=new", "--disable-gpu", "--no-sandbox", "--no-pdf-header-footer",
-                        "--allow-file-access-from-files", f"--print-to-pdf={SAIDA}", pagina.as_uri()],
+                        "--allow-file-access-from-files", "--virtual-time-budget=20000",
+                        f"--print-to-pdf={e['saida']}", pagina.as_uri()],
                        check=True, capture_output=True)
-    print(f"PDF gerado: {SAIDA.relative_to(RAIZ)} ({SAIDA.stat().st_size // 1024} KB)")
+    print(f"PDF gerado: {e['saida'].relative_to(RAIZ)} ({e['saida'].stat().st_size // 1024} KB)")
+
+
+def main():
+    nomes = sys.argv[1:] or list(ENTREGAS)
+    for nome in nomes:
+        if nome not in ENTREGAS:
+            sys.exit(f"entrega desconhecida: {nome} (use {', '.join(ENTREGAS)})")
+        gerar(nome)
 
 
 if __name__ == "__main__":

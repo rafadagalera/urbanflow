@@ -387,3 +387,14 @@ docker compose exec airflow-scheduler bash -c 'cd /opt/airflow/pipeline && pytho
 - **Fotografia, não série histórica.** As tabelas de indicadores são recriadas a cada execução; só `gold.execucao` guarda histórico. Comparar o índice entre meses exigiria particionar por data de referência.
 - **O pipeline não roda em nuvem.** Tudo sobe em Docker Compose numa máquina. O deploy em nuvem do produto é tratado na disciplina de DevOps. Para escalar, os candidatos naturais seriam um Airflow gerenciado e um armazenamento de objetos para bronze e silver.
 - **O GeoSampa é uma fonte instável.** O WFS cai com frequência. A retomada por página e o cache reduzem o problema, mas uma primeira execução pode levar várias tentativas.
+
+
+## Equipe (4ESPS)
+
+| Integrante | RM |
+| :--- | :--- |
+| Beatriz Silva Pinheiro Rocha | 553455 |
+| Enzzo Monteiro Barros Silva | 552616 |
+| Iago Diniz Fontes | 553776 |
+| Larissa Estella Gonçalves dos Santos | 552695 |
+| Rafael Alves do Nascimento | 553117 |
